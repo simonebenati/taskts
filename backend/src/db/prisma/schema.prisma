@@ -1,0 +1,172 @@
+// TaskTS Database Schema
+// Multi-tenant collaborative todo application with row-level tenancy
+
+generator client {
+  provider = "prisma-client"
+  output   = "./src/db/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// MULTI-TENANCY
+// =============================================================================
+
+/// Organization/Team - the top-level tenant entity
+model Tenant {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String   @db.VarChar(100)
+  subscription  String   @default("free") @db.VarChar(20)
+  paymentMethod String?  @db.VarChar(50)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  users  User[]
+  boards Board[]
+  roles  Role[]
+  groups Group[]
+
+  @@index([isActive])
+}
+
+// =============================================================================
+// USERS & ACCESS CONTROL
+// =============================================================================
+
+/// User belongs to exactly one tenant
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique @db.VarChar(255)
+  name      String   @db.VarChar(50)
+  surname   String   @db.VarChar(50)
+  password  String   @db.VarChar(255) // bcrypt hash
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  tenantId String  @db.Uuid
+  roleId   String  @db.Uuid
+  groupId  String? @db.Uuid
+
+  // Relations
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role          Role          @relation(fields: [roleId], references: [id])
+  group         Group?        @relation(fields: [groupId], references: [id])
+  ownedBoards   Board[]       @relation("BoardOwner")
+  ownedTasks    Task[]        @relation("TaskOwner")
+  assignedTasks Task[]        @relation("TaskAssignee")
+  refreshTokens RefreshToken[]
+
+  @@index([tenantId])
+  @@index([email])
+  @@index([tenantId, isActive])
+}
+
+/// Groups for organizing users within a tenant
+model Group {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @db.VarChar(100)
+  description String? @db.VarChar(500)
+  tenantId    String  @db.Uuid
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users  User[]
+
+  @@index([tenantId])
+}
+
+/// Role-based access control within a tenant
+model Role {
+  id       String @id @default(uuid()) @db.Uuid
+  name     String @db.VarChar(50) // e.g., "admin", "member", "viewer"
+  tenantId String @db.Uuid
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users  User[]
+
+  @@unique([tenantId, name]) // Role names unique per tenant
+  @@index([tenantId])
+}
+
+// =============================================================================
+// BOARDS & TASKS
+// =============================================================================
+
+/// Board / Project within a tenant
+model Board {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(1000)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys (multi-tenancy)
+  tenantId String @db.Uuid
+  ownerId  String @db.Uuid
+
+  // Relations
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  owner  User   @relation("BoardOwner", fields: [ownerId], references: [id])
+  tasks  Task[]
+
+  @@index([tenantId])
+  @@index([ownerId])
+}
+
+/// Task status enum
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+/// Task / Todo item within a board
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  title       String     @db.VarChar(200)
+  description String?    @db.VarChar(2000)
+  status      TaskStatus @default(TODO)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Foreign keys
+  boardId      String  @db.Uuid
+  ownerId      String  @db.Uuid
+  assigneeId   String? @db.Uuid
+  parentTaskId String? @db.Uuid // For subtasks
+
+  // Relations
+  board      Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  owner      User   @relation("TaskOwner", fields: [ownerId], references: [id])
+  assignee   User?  @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  parentTask Task?  @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subTasks   Task[] @relation("SubTasks")
+
+  @@index([boardId])
+  @@index([boardId, status])
+  @@index([assigneeId])
+  @@index([ownerId])
+}
+
+// =============================================================================
+// AUTHENTICATION
+// =============================================================================
+
+/// Refresh tokens for JWT authentication
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique @db.VarChar(255)
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}

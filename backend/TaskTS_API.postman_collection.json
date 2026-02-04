@@ -1,0 +1,768 @@
+{
+    "info": {
+        "name": "TaskTS API",
+        "description": "Multi-tenant collaborative todo application API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://localhost:443",
+            "type": "string"
+        },
+        {
+            "key": "accessToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refreshToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "tenantId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "boardId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "taskId",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Tenant & Auth",
+            "description": "Tenant creation and authentication flows",
+            "item": [
+                {
+                    "name": "1.1 Create Tenant (Signup)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.accessToken) {",
+                                    "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                                    "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                                    "    pm.collectionVariables.set('tenantId', jsonData.user.tenantId);",
+                                    "}",
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"tenantName\": \"Acme Corporation\",\n    \"adminEmail\": \"admin@acme.com\",\n    \"adminName\": \"John\",\n    \"adminSurname\": \"Doe\",\n    \"adminPassword\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/tenants",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tenants"
+                            ]
+                        },
+                        "description": "Creates a new tenant with an admin user. Returns auth tokens."
+                    }
+                },
+                {
+                    "name": "1.2 Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.accessToken) {",
+                                    "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                                    "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                                    "    pm.collectionVariables.set('tenantId', jsonData.user.tenantId);",
+                                    "}",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"admin@acme.com\",\n    \"password\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Authenticates a user and returns tokens."
+                    }
+                },
+                {
+                    "name": "1.3 Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"member@acme.com\",\n    \"name\": \"Jane\",\n    \"surname\": \"Smith\",\n    \"password\": \"MemberPass123!\",\n    \"tenantId\": \"{{tenantId}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Registers a new user in an existing tenant."
+                    }
+                },
+                {
+                    "name": "1.4 Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.accessToken) {",
+                                    "    pm.collectionVariables.set('accessToken', jsonData.accessToken);",
+                                    "    pm.collectionVariables.set('refreshToken', jsonData.refreshToken);",
+                                    "}",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/refresh",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh"
+                            ]
+                        },
+                        "description": "Exchanges a refresh token for a new access token."
+                    }
+                },
+                {
+                    "name": "1.5 Get Current Tenant",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/tenants/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "tenants",
+                                "me"
+                            ]
+                        },
+                        "description": "Gets the current tenant details."
+                    }
+                },
+                {
+                    "name": "1.6 Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "description": "Invalidates the refresh token."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Users",
+            "description": "User management endpoints",
+            "item": [
+                {
+                    "name": "2.1 Get Current User Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2.2 List Tenant Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users"
+                            ]
+                        },
+                        "description": "Lists all users in the tenant (for task assignment)."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Boards",
+            "description": "Board CRUD operations",
+            "item": [
+                {
+                    "name": "3.1 Create Board",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.data) {",
+                                    "    pm.collectionVariables.set('boardId', jsonData.data.id);",
+                                    "}",
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Sprint 1 Tasks\",\n    \"description\": \"Tasks for our first sprint\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/boards",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.2 List Boards",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.3 Get Board",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.4 Update Board",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Sprint 1 Tasks (Updated)\",\n    \"description\": \"Updated description\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3.5 Delete Board",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Tasks",
+            "description": "Task CRUD operations (nested under boards)",
+            "item": [
+                {
+                    "name": "4.1 Create Task",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.data) {",
+                                    "    pm.collectionVariables.set('taskId', jsonData.data.id);",
+                                    "}",
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Implement user authentication\",\n    \"description\": \"Add JWT-based authentication to the API\",\n    \"status\": \"TODO\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.2 List Tasks",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.3 Get Task",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks/{{taskId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks",
+                                "{{taskId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.4 Update Task Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"IN_PROGRESS\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks/{{taskId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks",
+                                "{{taskId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.5 Update Task (Full)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated description\",\n    \"status\": \"DONE\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks/{{taskId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks",
+                                "{{taskId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4.6 Delete Task",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/boards/{{boardId}}/tasks/{{taskId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "boards",
+                                "{{boardId}}",
+                                "tasks",
+                                "{{taskId}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Roles",
+            "description": "Role management (admin only)",
+            "item": [
+                {
+                    "name": "5.1 List Roles",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/roles",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "roles"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5.2 Create Role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"reviewer\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/roles",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "roles"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Real-Time Events",
+            "description": "Server-Sent Events for real-time updates",
+            "item": [
+                {
+                    "name": "6.1 Subscribe to Events (SSE)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{accessToken}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "text/event-stream"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/rt/events",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "rt",
+                                "events"
+                            ]
+                        },
+                        "description": "Opens an SSE connection. Note: Postman may not handle SSE well - use browser or curl for testing."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "7. Health Check",
+            "item": [
+                {
+                    "name": "7.1 Health Check",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/health",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

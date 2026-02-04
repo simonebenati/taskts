@@ -1,0 +1,29 @@
+[2026-02-04T22:28:50.784Z] POST /auth/refresh
+AppError: Invalid refresh token
+    at unauthorizedError (C:\Users\simone\Github\taskts\backend\src\server\middleware\error.middleware.ts:40:12)
+    at refresh (C:\Users\simone\Github\taskts\backend\src\server\controllers\auth.controller.ts:236:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+[2026-02-04T22:28:50.862Z] POST /auth/refresh
+AppError: Invalid refresh token
+    at unauthorizedError (C:\Users\simone\Github\taskts\backend\src\server\middleware\error.middleware.ts:40:12)
+    at refresh (C:\Users\simone\Github\taskts\backend\src\server\controllers\auth.controller.ts:236:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+[2026-02-04T22:31:15.000Z] POST /auth/refresh
+PrismaClientKnownRequestError: 
+Invalid `prisma.refreshToken.delete()` invocation in
+C:\Users\simone\Github\taskts\backend\src\server\controllers\auth.controller.ts:257:31
+
+  254 }
+  255 
+  256 // Delete old refresh token (token rotation)
+→ 257 await prisma.refreshToken.delete(
+An operation failed because it depends on one or more records that were required but not found. No record was found for a delete.
+    at Vr.handleRequestError (C:\Users\simone\Github\taskts\backend\node_modules\@prisma\client\src\runtime\RequestHandler.ts:228:13)
+    at Vr.handleAndLogRequestError (C:\Users\simone\Github\taskts\backend\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at Vr.request (C:\Users\simone\Github\taskts\backend\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async a (C:\Users\simone\Github\taskts\backend\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:805:24)
+    at async refresh (C:\Users\simone\Github\taskts\backend\src\server\controllers\auth.controller.ts:257:5)
+

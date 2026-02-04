@@ -1,0 +1,52 @@
+{
+  "name": "taskts",
+  "version": "1.0.0",
+  "description": "A typescript task tracker inspired by trello",
+  "homepage": "https://github.com/simonebenati/taskts#readme",
+  "bugs": {
+    "url": "https://github.com/simonebenati/taskts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonebenati/taskts.git"
+  },
+  "license": "MIT",
+  "author": "Simone Benati",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "npx tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "db:generate": "npx prisma generate --schema=src/db/prisma/schema.prisma",
+    "db:migrate": "npx prisma migrate dev --schema=src/db/prisma/schema.prisma",
+    "db:migrate:prod": "npx prisma migrate deploy --schema=src/db/prisma/schema.prisma",
+    "db:studio": "npx prisma studio --schema=src/db/prisma/schema.prisma",
+    "db:push": "npx prisma db push --schema=src/db/prisma/schema.prisma",
+    "test": "jest --config jest.config.cjs --coverage",
+    "test:watch": "jest --config jest.config.cjs --watch",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^25.2.0",
+    "@types/pg": "^8.16.0",
+    "jest": "^30.2.0",
+    "prisma": "^7.3.0",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
