@@ -16,7 +16,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "start": "npx prisma migrate deploy && node dist/server.js",
     "build": "tsc",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev",

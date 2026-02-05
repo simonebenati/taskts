@@ -11,3 +11,4 @@
 - Switch from SSE to WebSockets for proper real-time collaboration which is today's standard.
 - Improve light mode
 - Improve subtasks functionalities
+- Verify package.json for dependencies that can be removed or updated.

@@ -1,13 +1,13 @@
 /**
  * Unit tests for Board Controller
  */
-import { mockPrisma, resetMocks } from "../mocks/prisma.mock"
-import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock"
-import { createBoard, getBoards, getBoard, updateBoard, deleteBoard } from "../../src/server/controllers/board.controller"
-import type { CreateBoardBody, UpdateBoardBody } from "../../src/server/types/board.types"
+import { mockPrisma, resetMocks } from "../mocks/prisma.mock.js"
+import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock.js"
+import { createBoard, getBoards, getBoard, updateBoard, deleteBoard } from "../../src/server/controllers/board.controller.js"
+import type { CreateBoardBody, UpdateBoardBody } from "../../src/server/types/board.types.js"
 
 // Mock the events module
-jest.mock("../../src/server/utils/events", () => ({
+jest.mock("../../src/server/utils/events.js", () => ({
     emitBoardEvent: jest.fn(),
 }))
 
@@ -33,6 +33,7 @@ describe("Board Controller", () => {
                 description: createBoardBody.description,
                 ownerId: testUserPayload.userId,
                 tenantId: testUserPayload.tenantId,
+                groupId: null,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             }

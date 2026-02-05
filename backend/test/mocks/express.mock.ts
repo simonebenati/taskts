@@ -11,6 +11,7 @@ export interface TokenPayload {
     tenantId: string
     roleId: string
     roleName: string
+    groupId?: string | null
     iat: number
     exp: number
 }
@@ -91,6 +92,7 @@ export const testUserPayload: TokenPayload = {
     tenantId: "test-tenant-id",
     roleId: "test-role-id",
     roleName: "admin",
+    groupId: null,
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 900, // 15 minutes
 }

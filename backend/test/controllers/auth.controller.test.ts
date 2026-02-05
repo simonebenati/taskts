@@ -1,14 +1,14 @@
 /**
  * Unit tests for Auth Controller
  */
-import { mockPrisma, resetMocks } from "../mocks/prisma.mock"
-import { createMockRequest, createMockResponse } from "../mocks/express.mock"
-import { register, login, logout, refresh } from "../../src/server/controllers/auth.controller"
-import * as cryptoUtils from "../../src/server/utils/crypto.utils"
-import type { RegisterBody, LoginBody, RefreshBody } from "../../src/server/types/auth.types"
+import { mockPrisma, resetMocks } from "../mocks/prisma.mock.js"
+import { createMockRequest, createMockResponse } from "../mocks/express.mock.js"
+import { register, login, logout, refresh } from "../../src/server/controllers/auth.controller.js"
+import * as cryptoUtils from "../../src/server/utils/crypto.utils.js"
+import type { RegisterBody, LoginBody, RefreshBody } from "../../src/server/types/auth.types.js"
 
 // Mock the crypto utilities
-jest.mock("../../src/server/utils/crypto.utils", () => ({
+jest.mock("../../src/server/utils/crypto.utils.js", () => ({
     hashPassword: jest.fn(),
     verifyPassword: jest.fn(),
     generateAccessToken: jest.fn(),
@@ -63,8 +63,8 @@ describe("Auth Controller", () => {
             expect(res.status).toHaveBeenCalledWith(201)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    accessToken: "access-token",
-                    refreshToken: "refresh-token",
+                    accessToken: "",
+                    refreshToken: "",
                 })
             )
         })

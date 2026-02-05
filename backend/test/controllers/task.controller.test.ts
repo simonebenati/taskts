@@ -1,13 +1,13 @@
 /**
  * Unit tests for Task Controller
  */
-import { mockPrisma, resetMocks } from "../mocks/prisma.mock"
-import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock"
-import { createTask, getTasks, getTask, updateTask, deleteTask } from "../../src/server/controllers/task.controller"
-import type { CreateTaskBody, UpdateTaskBody } from "../../src/server/types/task.types"
+import { mockPrisma, resetMocks } from "../mocks/prisma.mock.js"
+import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock.js"
+import { createTask, getTasks, getTask, updateTask, deleteTask } from "../../src/server/controllers/task.controller.js"
+import type { CreateTaskBody, UpdateTaskBody } from "../../src/server/types/task.types.js"
 
 // Mock the events module
-jest.mock("../../src/server/utils/events", () => ({
+jest.mock("../../src/server/utils/events.js", () => ({
     emitTaskEvent: jest.fn(),
 }))
 

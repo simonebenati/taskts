@@ -1,9 +1,9 @@
 /**
  * Unit tests for Role Controller
  */
-import { mockPrisma, resetMocks } from "../mocks/prisma.mock"
-import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock"
-import { createRole, getRoles, updateRole, deleteRole } from "../../src/server/controllers/role.controller"
+import { mockPrisma, resetMocks } from "../mocks/prisma.mock.js"
+import { createMockAuthRequest, createMockResponse, testUserPayload } from "../mocks/express.mock.js"
+import { createRole, getRoles, updateRole, deleteRole } from "../../src/server/controllers/role.controller.js"
 
 describe("Role Controller", () => {
     beforeEach(() => {

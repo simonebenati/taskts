@@ -1,7 +1,7 @@
 /**
  * Unit tests for Error Middleware
  */
-import { createMockRequest, createMockResponse, createMockNext } from "../mocks/express.mock"
+import { createMockRequest, createMockResponse, createMockNext } from "../mocks/express.mock.js"
 import {
     AppError,
     validationError,
@@ -11,7 +11,7 @@ import {
     conflictError,
     internalError,
     errorMiddleware
-} from "../../src/server/middleware/error.middleware"
+} from "../../src/server/middleware/error.middleware.js"
 
 describe("Error Middleware", () => {
     describe("AppError class", () => {
