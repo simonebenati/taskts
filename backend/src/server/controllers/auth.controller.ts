@@ -142,7 +142,8 @@ export async function register(
                 name: user.name,
                 surname: user.surname,
                 tenantId: user.tenantId,
-                roleName: user.role.name
+                roleName: user.role.name,
+                groupId: user.groupId
             },
             message: 'Registration successful. Your account is pending admin approval.'
         } as any)
@@ -154,7 +155,8 @@ export async function register(
         userId: user.id,
         tenantId: user.tenantId,
         roleId: targetRoleId,
-        roleName: user.role.name
+        roleName: user.role.name,
+        groupId: user.groupId
     })
 
     const refreshTokenValue = generateRefreshToken()
@@ -178,7 +180,8 @@ export async function register(
             name: user.name,
             surname: user.surname,
             tenantId: user.tenantId,
-            roleName: user.role.name
+            roleName: user.role.name,
+            groupId: user.groupId
         }
     })
 }
@@ -207,6 +210,7 @@ export async function login(
             isActive: true,
             tenantId: true,
             roleId: true,
+            groupId: true,
             role: { select: { name: true } },
             tenant: { select: { isActive: true, name: true } }
         }
@@ -236,7 +240,8 @@ export async function login(
         userId: user.id,
         tenantId: user.tenantId,
         roleId: user.roleId,
-        roleName: user.role.name
+        roleName: user.role.name,
+        groupId: user.groupId
     })
 
     const refreshTokenValue = generateRefreshToken()
@@ -261,7 +266,8 @@ export async function login(
             surname: user.surname,
             tenantId: user.tenantId,
             roleName: user.role.name,
-            tenantName: user.tenant.name
+            tenantName: user.tenant.name,
+            groupId: user.groupId
         }
     })
 }
@@ -291,6 +297,7 @@ export async function refresh(
                     isActive: true,
                     tenantId: true,
                     roleId: true,
+                    groupId: true,
                     role: { select: { name: true } },
                     tenant: { select: { isActive: true } }
                 }
@@ -327,7 +334,8 @@ export async function refresh(
         userId: user.id,
         tenantId: user.tenantId,
         roleId: user.roleId,
-        roleName: user.role.name
+        roleName: user.role.name,
+        groupId: user.groupId
     })
 
     const newRefreshToken = generateRefreshToken()
@@ -351,7 +359,8 @@ export async function refresh(
             name: user.name,
             surname: user.surname,
             tenantId: user.tenantId,
-            roleName: user.role.name
+            roleName: user.role.name,
+            groupId: user.groupId
         }
     })
 }

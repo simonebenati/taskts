@@ -8,6 +8,7 @@
 export interface CreateBoardBody {
     name: string
     description?: string
+    groupId?: string | null
 }
 
 /**
@@ -16,6 +17,12 @@ export interface CreateBoardBody {
 export interface UpdateBoardBody {
     name?: string
     description?: string
+}
+
+export const createBoardSchema = {
+    name: { required: true, type: "string" as const, minLength: 1, maxLength: 100 },
+    description: { required: false, type: "string" as const, maxLength: 1000 },
+    groupId: { required: false, type: "string" as const }
 }
 
 /**
@@ -27,6 +34,8 @@ export interface BoardResponse {
     description: string | null
     ownerId: string
     tenantId: string
+    groupId?: string | null
+    group?: { id: string, name: string } | null
     createdAt: Date
     updatedAt: Date
     taskCount?: number
@@ -37,5 +46,7 @@ export interface BoardResponse {
         surname: string
         tenantId: string
         roleName?: string
+        groupId?: string | null
+        group?: { id: string, name: string } | null
     }
 }

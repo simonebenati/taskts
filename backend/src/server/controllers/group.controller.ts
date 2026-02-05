@@ -62,7 +62,13 @@ export async function getGroups(
     const { tenantId } = req.user
 
     const groups = await prisma.group.findMany({
-        where: { tenantId },
+        where: {
+            tenantId,
+            ...(req.user.roleName !== 'admin' && {
+                id: req.user.groupId || undefined // If null, they might not see any groups? 
+                // Actually if groupId is null, they should see no groups in the organizational list.
+            })
+        },
         include: {
             _count: { select: { users: true } }
         },

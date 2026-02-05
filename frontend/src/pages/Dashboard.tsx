@@ -14,6 +14,8 @@ interface Board {
     description: string;
     tenantId: string;
     ownerId: string;
+    groupId?: string | null;
+    group?: { id: string; name: string } | null;
     owner?: {
         id: string;
         name: string;
@@ -34,6 +36,7 @@ export const Dashboard = () => {
     const [error, setError] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [newBoardName, setNewBoardName] = useState('');
+    const [newBoardGroup, setNewBoardGroup] = useState<string>('');
 
     const fetchBoards = async () => {
         try {
@@ -67,7 +70,7 @@ export const Dashboard = () => {
     };
 
     const filteredBoards = selectedGroup
-        ? boards.filter(board => board.owner?.groupId === selectedGroup)
+        ? boards.filter(board => board.groupId === selectedGroup)
         : boards;
 
     // SSE Subscription for real-time board updates
@@ -113,8 +116,12 @@ export const Dashboard = () => {
     const handleCreateBoard = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/boards', { name: newBoardName });
+            await api.post('/boards', {
+                name: newBoardName,
+                groupId: newBoardGroup || undefined
+            });
             setNewBoardName('');
+            setNewBoardGroup('');
             setIsCreating(false);
             fetchBoards();
         } catch (error) {
@@ -136,7 +143,7 @@ export const Dashboard = () => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => window.dispatchEvent(new Event('open-search'))}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors border border-transparent hover:border-slate-700"
+                            className="p-2 dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900 dark:hover:bg-slate-800 hover:bg-slate-100 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700 hover:border-slate-200"
                             title="Search (Cmd+K)"
                         >
                             <Search className="w-5 h-5" />
@@ -165,7 +172,7 @@ export const Dashboard = () => {
                 </div>
 
                 {error && (
-                    <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200">
+                    <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 dark:rounded-lg rounded-xl text-red-600 dark:text-red-200">
                         {error}
                     </div>
                 )}
@@ -182,7 +189,7 @@ export const Dashboard = () => {
                             All Groups ({boards.length})
                         </Button>
                         {groups.map(group => {
-                            const count = boards.filter(b => b.owner?.groupId === group.id).length;
+                            const count = boards.filter(b => b.groupId === group.id).length;
                             return (
                                 <Button
                                     key={group.id}
@@ -199,9 +206,10 @@ export const Dashboard = () => {
                     </div>
                 )}
 
+
                 {isCreating && (
                     <Card className="mb-12 border-indigo-500/50 animate-in ring-1 ring-indigo-500/20">
-                        <form onSubmit={handleCreateBoard} className="flex flex-col md:flex-row gap-4 md:items-end">
+                        <form onSubmit={handleCreateBoard} className="flex flex-col gap-4">
                             <div className="flex-1">
                                 <Input
                                     label="Board Name"
@@ -210,7 +218,22 @@ export const Dashboard = () => {
                                     autoFocus
                                     placeholder="e.g. Product Roadmap, Marketing Campaign..."
                                     className="h-12 text-lg"
+                                    required
                                 />
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Group (Required)</label>
+                                <select
+                                    value={newBoardGroup}
+                                    onChange={(e) => setNewBoardGroup(e.target.value)}
+                                    required
+                                    className="w-full h-12 px-4 dark:bg-slate-800/50 bg-white border dark:border-white/10 border-slate-200 rounded-lg dark:text-white text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="">Select a group</option>
+                                    {groups.map(g => (
+                                        <option key={g.id} value={g.id}>{g.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="flex gap-3">
                                 <Button type="submit" size="lg">Create Board</Button>
@@ -223,14 +246,14 @@ export const Dashboard = () => {
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="h-56 rounded-2xl bg-slate-800/50 animate-pulse border border-white/5" />
+                            <div key={i} className="h-56 rounded-2xl dark:bg-slate-800/50 bg-slate-100 animate-pulse border dark:border-white/5 border-slate-200" />
                         ))}
                     </div>
                 ) : filteredBoards.length === 0 && !error ? (
                     <div className="flex flex-col items-center justify-center py-20 animate-in">
                         <div className="relative group cursor-pointer" onClick={() => setIsCreating(true)}>
                             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative w-24 h-24 bg-slate-900 ring-1 ring-white/10 rounded-full flex items-center justify-center shadow-2xl">
+                            <div className="relative w-24 h-24 dark:bg-slate-900 bg-white ring-1 dark:ring-white/10 ring-slate-200 rounded-full flex items-center justify-center shadow-2xl">
                                 <Layout className="w-10 h-10 text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
                             </div>
                         </div>
@@ -260,14 +283,14 @@ export const Dashboard = () => {
                                             </div>
                                             <div className="flex flex-col gap-2 items-end">
                                                 {board._count && (
-                                                    <span className="text-xs font-bold tracking-wider px-3 py-1 rounded-full bg-slate-900/50 text-slate-400 border border-white/10 group-hover:border-indigo-500/30 transition-colors">
+                                                    <span className="text-xs font-bold tracking-wider px-3 py-1 rounded-full dark:bg-slate-900/50 bg-slate-100 dark:text-slate-400 text-slate-500 border dark:border-white/10 border-slate-200 group-hover:border-indigo-500/30 transition-colors">
                                                         {board._count.tasks} TASKS
                                                     </span>
                                                 )}
-                                                {board.owner?.group && (
-                                                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                                {board.group && (
+                                                    <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/20 dark:border-blue-500/30">
                                                         <Users2 className="w-3 h-3 inline mr-1" />
-                                                        {board.owner.group.name}
+                                                        {board.group.name}
                                                     </span>
                                                 )}
                                             </div>

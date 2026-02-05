@@ -2,8 +2,8 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
-import { Button, Input, Card } from '../components/ui';
-import { ArrowLeft, Users, Plus, Trash2, Edit } from 'lucide-react';
+import { Button, Input, Card, Modal } from '../components/ui';
+import { ArrowLeft, Users, Plus, Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { type Group, type User } from '../types';
 
 export const GroupManagement = () => {
@@ -16,6 +16,7 @@ export const GroupManagement = () => {
     const [error, setError] = useState<string | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+    const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
 
@@ -66,10 +67,11 @@ export const GroupManagement = () => {
         }
     };
 
-    const deleteGroup = async (groupId: string, groupName: string) => {
-        if (!confirm(`Delete group "${groupName}"?`)) return;
+    const deleteGroup = async () => {
+        if (!groupToDelete) return;
         try {
-            await api.delete(`/groups/${groupId}`);
+            await api.delete(`/groups/${groupToDelete.id}`);
+            setGroupToDelete(null);
             await fetchData();
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to delete group. Make sure no users are assigned to it.');
@@ -161,8 +163,8 @@ export const GroupManagement = () => {
                                                 <Button size="sm" variant="ghost" onClick={() => openEditModal(group)}>
                                                     <Edit className="w-4 h-4" />
                                                 </Button>
-                                                <Button size="sm" variant="ghost" onClick={() => deleteGroup(group.id, group.name)}>
-                                                    <Trash2 className="w-4 h-4 text-red-400" />
+                                                <Button size="sm" variant="ghost" onClick={() => setGroupToDelete(group)}>
+                                                    <Trash2 className="w-4 h-4 dark:text-red-400 text-red-500" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -193,43 +195,65 @@ export const GroupManagement = () => {
             </main>
 
             {/* Create/Edit Group Modal */}
-            {(showCreateModal || editingGroup) && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <Card className="max-w-md w-full p-6 bg-slate-900 border border-white/10">
-                        <h2 className="text-xl font-bold text-white mb-4">
-                            {editingGroup ? 'Edit Group' : 'Create New Group'}
-                        </h2>
-                        <form onSubmit={editingGroup ? updateGroup : createGroup} className="space-y-4">
-                            <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Group Name</label>
-                                <Input
-                                    value={groupName}
-                                    onChange={(e) => setGroupName(e.target.value)}
-                                    placeholder="e.g., Engineering, Marketing"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Description (Optional)</label>
-                                <textarea
-                                    value={groupDescription}
-                                    onChange={(e) => setGroupDescription(e.target.value)}
-                                    placeholder="Brief description of the group"
-                                    className="w-full px-3 py-2 bg-slate-800/50 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[80px]"
-                                />
-                            </div>
-                            <div className="flex gap-2 mt-6">
-                                <Button type="button" variant="secondary" className="flex-1" onClick={closeModal}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" className="flex-1">
-                                    {editingGroup ? 'Update Group' : 'Create Group'}
-                                </Button>
-                            </div>
-                        </form>
-                    </Card>
+            <Modal
+                isOpen={showCreateModal || !!editingGroup}
+                onClose={closeModal}
+                title={editingGroup ? 'Edit Group' : 'Create New Group'}
+            >
+                <form onSubmit={editingGroup ? updateGroup : createGroup} className="space-y-4">
+                    <div>
+                        <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Group Name</label>
+                        <Input
+                            value={groupName}
+                            onChange={(e) => setGroupName(e.target.value)}
+                            placeholder="e.g., Engineering, Marketing"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Description</label>
+                        <textarea
+                            value={groupDescription}
+                            onChange={(e) => setGroupDescription(e.target.value)}
+                            placeholder="Brief description of the group"
+                            className="w-full px-3 py-2 dark:bg-slate-800/50 bg-white border dark:border-white/10 border-slate-200 rounded-lg dark:text-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[80px] transition-all"
+                            required
+                        />
+                    </div>
+                    <div className="flex gap-2 mt-6">
+                        <Button type="button" variant="ghost" className="flex-1" onClick={closeModal}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" className="flex-1">
+                            {editingGroup ? 'Update Group' : 'Create Group'}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Delete Group Modal */}
+            <Modal
+                isOpen={!!groupToDelete}
+                onClose={() => setGroupToDelete(null)}
+                title="Delete Group"
+                className="max-w-md border-red-500/20"
+            >
+                <div className="text-center p-2">
+                    <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-medium dark:text-white text-slate-900 mb-2">Delete Group?</h3>
+                    <p className="dark:text-slate-400 text-slate-600 mb-6">
+                        Are you sure you want to delete <span className="dark:text-white text-slate-900 font-bold">"{groupToDelete?.name}"</span>?
+                        This action cannot be undone and will only work if no users are currently assigned to this group.
+                    </p>
+                    <div className="flex justify-center gap-3">
+                        <input type="hidden" /> {/* Focus trap helper */}
+                        <Button type="button" variant="ghost" onClick={() => setGroupToDelete(null)}>Cancel</Button>
+                        <Button type="button" variant="danger" onClick={deleteGroup}>Yes, Delete Group</Button>
+                    </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 };

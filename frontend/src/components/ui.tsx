@@ -90,11 +90,11 @@ export const Modal = ({ isOpen, onClose, title, children, className }: ModalProp
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={onClose} />
-            <div className={cn("relative w-full max-w-lg bg-slate-800/90 border border-white/10 rounded-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200", className)}>
-                <div className="flex items-center justify-between p-4 border-b border-white/5">
-                    {title && <h3 className="text-lg font-semibold font-display tracking-tight text-white">{title}</h3>}
-                    <button onClick={onClose} className="rounded-md p-1 hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+            <div className="absolute inset-0 bg-slate-900/60 dark:bg-slate-900/80 backdrop-blur-sm" onClick={onClose} />
+            <div className={cn("relative w-full max-w-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200", className)}>
+                <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-white/5">
+                    {title && <h3 className="text-lg font-semibold font-display tracking-tight text-slate-900 dark:text-white">{title}</h3>}
+                    <button onClick={onClose} className="rounded-md p-1 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
                         <span className="sr-only">Close</span>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

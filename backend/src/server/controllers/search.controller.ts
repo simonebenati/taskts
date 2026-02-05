@@ -1,66 +1,67 @@
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import { prisma } from "../../db/bootstrap.js";
-
-interface AuthRequest extends Request {
-    user?: {
-        userId: string;
-        tenantId: string;
-        role: string;
-    }
-}
+import { type AuthenticatedRequest } from "../types/auth.types.js";
 
 export class SearchController {
-    static async search(req: AuthRequest, res: Response) {
+    static async search(req: AuthenticatedRequest, res: Response) {
         try {
             const { q } = req.query;
             const query = q as string;
-            const userId = req.user!.userId;
+            const { userId, tenantId, roleName, groupId: userGroupId } = req.user;
 
             if (!query || query.length < 2) {
                 res.json({ success: true, data: { boards: [], tasks: [] } });
                 return;
             }
 
-            // Search Boards (matched by name or description)
-            // User must be owner or member (if we had specific member logic, but currently owner/tenant based)
-            // Assuming simplified model: user can see boards they own or are in tenant? 
-            // Previous code used `where: { OR: [{ ownerId: req.user.userId }, { tenantId: req.user.tenantId }] } ` generally.
-            // Let's mimic BoardController.list logic for permission scope.
+            // Build board filter based on role
+            const boardFilter: any = {
+                tenantId,
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } }
+                ]
+            };
+
+            // If not admin, restrict to user's group or ownership
+            if (roleName !== 'admin') {
+                boardFilter.AND = [
+                    {
+                        OR: [
+                            { groupId: userGroupId },
+                            { ownerId: userId }
+                        ]
+                    }
+                ];
+            }
 
             const boards = await prisma.board.findMany({
-                where: {
-                    AND: [
-                        { OR: [{ ownerId: userId }, { tenantId: req.user!.tenantId }] },
-                        {
-                            OR: [
-                                { name: { contains: query, mode: 'insensitive' } },
-                                { description: { contains: query, mode: 'insensitive' } }
-                            ]
-                        }
-                    ]
-                },
+                where: boardFilter,
                 take: 5,
                 select: { id: true, name: true, description: true }
             });
 
             // Search Tasks (matched by title or description)
             // Access control: tasks in boards user has access to.
+            const taskFilter: any = {
+                OR: [
+                    { title: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } }
+                ],
+                board: {
+                    tenantId
+                }
+            };
+
+            if (roleName !== 'admin') {
+                taskFilter.board.OR = [
+                    { groupId: userGroupId },
+                    { ownerId: userId }
+                ];
+            }
+
             const tasks = await prisma.task.findMany({
-                where: {
-                    AND: [
-                        {
-                            board: {
-                                OR: [{ ownerId: userId }, { tenantId: req.user!.tenantId }]
-                            }
-                        },
-                        {
-                            OR: [
-                                { title: { contains: query, mode: 'insensitive' } },
-                                { description: { contains: query, mode: 'insensitive' } }
-                            ]
-                        }
-                    ]
-                },
+                where: taskFilter,
                 take: 5,
                 select: {
                     id: true,

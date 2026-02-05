@@ -133,7 +133,7 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
     });
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className="bg-slate-900 border-slate-700">
+        <Modal isOpen={isOpen} onClose={onClose} className="dark:bg-slate-900 bg-white dark:border-slate-700 border-slate-200 shadow-2xl">
             {/* Header / Title Editing */}
             <div className="mb-6">
                 {isEditingTitle ? (
@@ -141,14 +141,14 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                         <Input
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            className="text-xl font-bold bg-slate-800"
+                            className="text-xl font-bold dark:bg-slate-800 bg-white"
                             autoFocus
                         />
                         <textarea
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             placeholder="Add a more detailed description..."
-                            className="w-full bg-slate-800 border-slate-700 rounded-lg p-3 text-sm text-slate-200 outline-none focus:border-blue-500 min-h-[100px]"
+                            className="w-full dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-200 rounded-lg p-3 text-sm dark:text-slate-200 text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[100px] transition-all"
                         />
                         <div className="flex justify-end gap-2">
                             <Button variant="ghost" size="sm" onClick={() => setIsEditingTitle(false)}>Cancel</Button>
@@ -157,10 +157,10 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                     </div>
                 ) : (
                     <div onClick={() => setIsEditingTitle(true)} className="group cursor-pointer">
-                        <h2 className="text-2xl font-bold mb-1 group-hover:text-blue-400 transition-colors flex items-center gap-2">
+                        <h2 className="text-2xl font-bold mb-1 dark:text-white text-slate-900 group-hover:text-blue-500 transition-colors flex items-center gap-2">
                             {localTask.title}
                         </h2>
-                        <p className="text-slate-400 text-sm min-h-[1.5em] group-hover:text-slate-300 transition-colors">
+                        <p className="dark:text-slate-400 text-slate-600 text-sm min-h-[1.5em] group-hover:dark:text-slate-300 group-hover:text-slate-800 transition-colors">
                             {localTask.description || "No description provided."}
                         </p>
                     </div>
@@ -170,21 +170,21 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
             <div className="flex gap-8 flex-col-reverse md:flex-row">
                 {/* Main Content: Subtasks */}
                 <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <CheckSquare className="w-4 h-4" /> Subtasks
+                    <h3 className="text-xs font-semibold dark:text-slate-500 text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <CheckSquare className="w-4 h-4 text-blue-500" /> Subtasks
                     </h3>
 
                     <div className="space-y-2 mb-4">
                         {/* Progress Bar */}
                         {localTask.subTasks && localTask.subTasks.length > 0 && (
-                            <div className="mb-4">
-                                <div className="flex justify-between text-xs text-slate-400 mb-1">
-                                    <span>Progress</span>
-                                    <span>{Math.round((localTask.subTasks.filter(t => t.status === TaskStatus.DONE).length / localTask.subTasks.length) * 100)}%</span>
+                            <div className="mb-6">
+                                <div className="flex justify-between text-xs dark:text-slate-400 text-slate-500 mb-1.5 font-medium">
+                                    <span>Task Progress</span>
+                                    <span className="dark:text-blue-400 text-blue-600">{Math.round((localTask.subTasks.filter(t => t.status === TaskStatus.DONE).length / localTask.subTasks.length) * 100)}%</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-1.5 w-full dark:bg-slate-800 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                     <div
-                                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                                        className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                                         style={{ width: `${(localTask.subTasks.filter(t => t.status === TaskStatus.DONE).length / localTask.subTasks.length) * 100}%` }}
                                     />
                                 </div>
@@ -192,14 +192,14 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                         )}
 
                         {sortedSubtasks?.map(sub => (
-                            <div key={sub.id} className="group flex items-start gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors">
+                            <div key={sub.id} className="group flex items-start gap-3 p-2.5 rounded-lg dark:hover:bg-slate-800/50 hover:bg-slate-50 transition-all border border-transparent hover:dark:border-white/5 hover:border-slate-200">
                                 <button
                                     onClick={() => handleToggleSubtask(sub)}
                                     className={cn("mt-0.5 flex-shrink-0 transition-colors", sub.status === TaskStatus.DONE ? "text-blue-500" : "text-slate-500 hover:text-slate-400")}
                                 >
                                     {sub.status === TaskStatus.DONE ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5" />}
                                 </button>
-                                <span className={cn("text-sm flex-1 transition-all", sub.status === TaskStatus.DONE ? "text-slate-500 line-through" : "text-slate-200")}>
+                                <span className={cn("text-sm flex-1 transition-all", sub.status === TaskStatus.DONE ? "dark:text-slate-500 text-slate-400 line-through" : "dark:text-slate-200 text-slate-800")}>
                                     {sub.title}
                                 </span>
                                 <button onClick={() => handleDeleteSubtask(sub.id)} className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-opacity">
@@ -225,27 +225,27 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                 {/* Sidebar: Metadata & Actions */}
                 <div className="w-full md:w-48 space-y-6">
                     <div>
-                        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Assignee</h3>
+                        <h3 className="text-xs font-semibold dark:text-slate-500 text-slate-500 uppercase tracking-wider mb-3">Assignee</h3>
                         <div className="relative group">
-                            <Button variant="ghost" className="w-full justify-start gap-2 border border-slate-700 bg-slate-800/50 hover:bg-slate-800">
+                            <Button variant="ghost" className="w-full justify-start gap-2 border dark:border-slate-700 border-slate-200 dark:bg-slate-800/50 bg-white hover:dark:bg-slate-800 hover:bg-slate-50 shadow-sm transition-all">
                                 {localTask.assignee ? (
                                     <>
                                         <UserAvatar name={localTask.assignee.name} surname={localTask.assignee.surname} size="sm" />
-                                        <span className="truncate">{localTask.assignee.name}</span>
+                                        <span className="truncate dark:text-white text-slate-900 font-medium">{localTask.assignee.name}</span>
                                     </>
                                 ) : (
                                     <>
-                                        <UserIcon className="w-4 h-4 text-slate-400" />
-                                        <span className="text-slate-400">Unassigned</span>
+                                        <UserIcon className="w-4 h-4 dark:text-slate-400 text-slate-500" />
+                                        <span className="dark:text-slate-400 text-slate-500 italic">Unassigned</span>
                                     </>
                                 )}
                             </Button>
 
                             {/* Simple Dropdown for Assignment */}
-                            <div className="absolute top-full left-0 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden hidden group-hover:block z-20 max-h-48 overflow-y-auto">
+                            <div className="absolute top-full left-0 w-full mt-1 dark:bg-slate-800 bg-white border dark:border-slate-700 border-slate-200 rounded-lg shadow-2xl overflow-hidden hidden group-hover:block z-20 max-h-48 overflow-y-auto">
                                 <button
                                     onClick={() => handleAssign('')}
-                                    className="w-full text-left px-3 py-2 text-sm text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+                                    className="w-full text-left px-3 py-2 text-sm dark:text-slate-400 text-slate-500 dark:hover:bg-slate-700 hover:bg-slate-50 dark:hover:text-white hover:text-slate-900 transition-colors"
                                 >
                                     Unassigned
                                 </button>
@@ -253,10 +253,10 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                                     <button
                                         key={user.id}
                                         onClick={() => handleAssign(user.id)}
-                                        className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2"
+                                        className="w-full text-left px-3 py-2 text-sm dark:text-slate-200 text-slate-800 dark:hover:bg-slate-700 hover:bg-slate-50 dark:hover:text-white hover:text-slate-900 transition-colors flex items-center gap-2"
                                     >
                                         <UserAvatar name={user.name} surname={user.surname} size="sm" className="w-5 h-5 text-[10px]" />
-                                        <span className="truncate">{user.name} {user.surname}</span>
+                                        <span className="truncate font-medium">{user.name} {user.surname}</span>
                                     </button>
                                 ))}
                             </div>
@@ -267,12 +267,12 @@ export const TaskDetailModal = ({ task, isOpen, onClose, onUpdate, tenantUsers }
                         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Metadata</h3>
                         <dl className="space-y-2 text-xs text-slate-400">
                             <div>
-                                <dt className="inline text-slate-500 mr-2">Status:</dt>
-                                <dd className="inline font-medium text-slate-300">{localTask.status.replace('_', ' ')}</dd>
+                                <dt className="inline dark:text-slate-500 text-slate-500 mr-2">Status:</dt>
+                                <dd className="inline font-bold dark:text-blue-400 text-blue-600 uppercase tracking-tighter text-[10px]">{localTask.status.replace('_', ' ')}</dd>
                             </div>
                             <div>
-                                <dt className="inline text-slate-500 mr-2">Created:</dt>
-                                <dd className="inline">{new Date(localTask.createdAt).toLocaleDateString()}</dd>
+                                <dt className="inline dark:text-slate-500 text-slate-500 mr-2">Created:</dt>
+                                <dd className="inline dark:text-slate-400 text-slate-700">{new Date(localTask.createdAt).toLocaleDateString()}</dd>
                             </div>
                         </dl>
                     </div>

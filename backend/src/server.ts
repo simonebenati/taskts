@@ -16,6 +16,7 @@ import groupRouter from "./server/routes/group.routes.js"
 import inviteRouter from "./server/routes/invite.routes.js"
 import rtRouter from "./server/routes/rt.routes.js"
 import searchRouter from "./server/routes/global_search.routes.js"
+import { MetricsController } from "./server/controllers/metrics.controller.js"
 
 const app = express()
 app.use(express.json())
@@ -24,6 +25,9 @@ app.use(express.json())
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() })
 })
+
+// --- Prometheus Metrics ---
+app.get("/metrics", MetricsController.getMetrics)
 
 // --- Mount Routes ---
 app.use("/auth", authRouter)           // Authentication (login, register, refresh, logout)

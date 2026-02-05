@@ -38,7 +38,11 @@ export const UserManagement = () => {
                 api.get<{ success: boolean; data: Group[] }>('/groups'),
                 api.get<{ success: boolean; data: Invite[] }>('/invites')
             ]);
-            setUsers(usersRes.data.data);
+            setUsers(usersRes.data.data.map((u: any) => ({
+                ...u,
+                groupId: u.group?.id || null,
+                roleName: u.role?.name || u.roleName
+            })));
             setRoles(rolesRes.data.data);
             setGroups(groupsRes.data.data);
             setInvites(invitesRes.data.data || []);
@@ -89,8 +93,16 @@ export const UserManagement = () => {
 
     const changeUserRole = async (userId: string, roleName: string) => {
         try {
-            await api.put(`/users/${userId}/role`, { roleName });
-            await fetchData();
+            const response = await api.put<{ success: boolean; data: User }>(`/users/${userId}/role`, { roleName });
+            const updatedUser = response.data.data;
+            // Update local state with API response to avoid race condition
+            setUsers(prevUsers => prevUsers.map(u =>
+                u.id === userId ? {
+                    ...u,
+                    roleName: updatedUser.role?.name || updatedUser.roleName,
+                    role: updatedUser.role
+                } : u
+            ));
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to change role');
         }
@@ -98,8 +110,16 @@ export const UserManagement = () => {
 
     const assignUserToGroup = async (userId: string, groupId: string | null) => {
         try {
-            await api.put(`/users/${userId}/group`, { groupId });
-            await fetchData();
+            const response = await api.put<{ success: boolean; data: User }>(`/users/${userId}/group`, { groupId });
+            const updatedUser = response.data.data;
+            // Update local state with API response to avoid race condition
+            setUsers(prevUsers => prevUsers.map(u =>
+                u.id === userId ? {
+                    ...u,
+                    groupId: updatedUser.group?.id || null,
+                    group: updatedUser.group
+                } : u
+            ));
         } catch (err: any) {
             alert(err.response?.data?.error || 'Failed to assign group');
         }
@@ -212,9 +232,9 @@ export const UserManagement = () => {
     if (currentUser?.roleName !== 'admin') {
         return (
             <div className="min-h-screen app-bg flex items-center justify-center p-4">
-                <Card className="p-8 text-center max-w-md bg-slate-900/50 backdrop-blur-xl border border-white/10">
-                    <h2 className="text-xl font-bold text-white mb-2">Access Denied</h2>
-                    <p className="text-slate-400 mb-6">Only administrators can manage users.</p>
+                <Card className="p-8 text-center max-w-md dark:bg-slate-900/50 bg-white backdrop-blur-xl border dark:border-white/10 border-slate-200 shadow-xl">
+                    <h2 className="text-xl font-bold dark:text-white text-slate-900 mb-2">Access Denied</h2>
+                    <p className="dark:text-slate-400 text-slate-600 mb-6">Only administrators can manage users.</p>
                     <Button onClick={() => navigate('/')}>Back to Dashboard</Button>
                 </Card>
             </div>
@@ -227,11 +247,11 @@ export const UserManagement = () => {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-slate-400 hover:text-white">
+                            <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900">
                                 <ArrowLeft className="w-4 h-4 mr-1" />
                                 Back
                             </Button>
-                            <h1 className="text-2xl font-bold text-white">User Management</h1>
+                            <h1 className="text-2xl font-bold dark:text-white text-slate-900">User Management</h1>
                         </div>
                         <Button onClick={() => setShowInviteModal(true)}>
                             <UserPlus className="w-4 h-4 mr-2" />
@@ -247,17 +267,17 @@ export const UserManagement = () => {
 
                     {/* Pending Approvals */}
                     {pendingUsers.length > 0 && (
-                        <Card className="p-6 bg-yellow-500/5 backdrop-blur-xl border border-yellow-500/20">
-                            <h2 className="text-lg font-semibold text-yellow-300 mb-4">Pending Approvals ({pendingUsers.length})</h2>
+                        <Card className="p-6 dark:bg-yellow-500/5 bg-yellow-50/50 backdrop-blur-xl border dark:border-yellow-500/20 border-yellow-200">
+                            <h2 className="text-lg font-semibold dark:text-yellow-300 text-yellow-700 mb-4">Pending Approvals ({pendingUsers.length})</h2>
                             <div className="space-y-3">
                                 {pendingUsers.map(user => (
-                                    <div key={user.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-white/10">
+                                    <div key={user.id} className="flex items-center justify-between p-4 dark:bg-slate-900/50 bg-white rounded-lg border dark:border-white/10 border-yellow-100 shadow-sm">
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <p className="font-medium text-white">{user.name} {user.surname}</p>
+                                                <p className="font-medium dark:text-white text-slate-900">{user.name} {user.surname}</p>
                                                 {user.id === currentUser?.id && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-bold">YOU</span>}
                                             </div>
-                                            <p className="text-sm text-slate-400">{user.email}</p>
+                                            <p className="text-sm dark:text-slate-400 text-slate-500">{user.email}</p>
                                         </div>
                                         <div className="flex gap-2">
                                             <Button size="sm" onClick={() => approveUser(user.id)}>
@@ -301,7 +321,7 @@ export const UserManagement = () => {
                     </div>
 
                     {/* Users List */}
-                    <Card className="p-6 bg-slate-900/50 backdrop-blur-xl border border-white/10">
+                    <Card className="p-6 dark:bg-slate-900/50 bg-white backdrop-blur-xl border dark:border-white/10 border-slate-200 shadow-sm">
                         <div className="space-y-4">
                             {loading ? (
                                 <p className="text-slate-400 text-center py-8">Loading...</p>
@@ -314,11 +334,11 @@ export const UserManagement = () => {
                                     const isSelf = user.id === currentUser?.id;
 
                                     return (
-                                        <div key={user.id} className="p-4 bg-slate-800/50 rounded-lg border border-white/10 transition-all hover:bg-slate-800/70">
+                                        <div key={user.id} className="p-4 dark:bg-slate-800/50 bg-slate-50/50 rounded-lg border dark:border-white/10 border-slate-200/60 transition-all hover:dark:bg-slate-800/70 hover:bg-slate-100/50">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <p className="font-medium text-white truncate">{user.name} {user.surname}</p>
+                                                        <p className="font-medium dark:text-white text-slate-900 truncate">{user.name} {user.surname}</p>
                                                         {isSelf && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-bold">YOU</span>}
                                                         {user.isActive ? (
                                                             <span className="px-2 py-0.5 text-[10px] rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
@@ -330,12 +350,12 @@ export const UserManagement = () => {
                                                             </span>
                                                         )}
                                                         {user.group && (
-                                                            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                                            <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/20">
                                                                 {user.group.name}
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-slate-400 mb-3 truncate">{user.email}</p>
+                                                    <p className="text-sm dark:text-slate-400 text-slate-500 mb-3 truncate">{user.email}</p>
                                                     <div className="flex flex-wrap gap-4 text-sm">
                                                         <div>
                                                             <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Role</label>
@@ -343,7 +363,7 @@ export const UserManagement = () => {
                                                                 value={user.roleName}
                                                                 onChange={(e) => changeUserRole(user.id, e.target.value)}
                                                                 disabled={isProtected || isSelf}
-                                                                className="px-2 py-1 bg-slate-700/50 border border-white/10 rounded text-white text-xs outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                className="px-2 py-1 dark:bg-slate-700/50 bg-white border dark:border-white/10 border-slate-200 rounded dark:text-white text-slate-900 text-xs outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 {roles.map(role => (
                                                                     <option key={role.id} value={role.name}>{role.name}</option>
@@ -356,7 +376,7 @@ export const UserManagement = () => {
                                                                 value={user.groupId || ''}
                                                                 onChange={(e) => assignUserToGroup(user.id, e.target.value || null)}
                                                                 disabled={isProtected || isSelf}
-                                                                className="px-2 py-1 bg-slate-700/50 border border-white/10 rounded text-white text-xs outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                className="px-2 py-1 dark:bg-slate-700/50 bg-white border dark:border-white/10 border-slate-200 rounded dark:text-white text-slate-900 text-xs outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 <option value="">No Group</option>
                                                                 {groups.map(group => (
@@ -449,34 +469,34 @@ export const UserManagement = () => {
 
                     {/* Pending Invites Section */}
                     {invites.length > 0 && (
-                        <Card className="p-6 bg-slate-900/50 backdrop-blur-xl border border-white/10 mb-8">
+                        <Card className="p-6 dark:bg-slate-900/50 bg-white backdrop-blur-xl border dark:border-white/10 border-slate-200 shadow-sm mb-8">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
                                     <Mail className="w-5 h-5 text-indigo-400" />
-                                    <h2 className="text-lg font-semibold text-white">Pending Invites</h2>
+                                    <h2 className="text-lg font-semibold dark:text-white text-slate-900">Pending Invites</h2>
                                 </div>
-                                <Button variant="ghost" size="sm" onClick={fetchData} className="text-slate-400">
+                                <Button variant="ghost" size="sm" onClick={fetchData} className="dark:text-slate-400 text-slate-500">
                                     <RefreshCw className="w-4 h-4 mr-1" />
                                     Refresh
                                 </Button>
                             </div>
                             <div className="space-y-3">
                                 {invites.map(invite => (
-                                    <div key={invite.id} className="p-4 bg-slate-800/50 rounded-xl border border-white/5 flex items-center justify-between group">
+                                    <div key={invite.id} className="p-4 dark:bg-slate-800/50 bg-slate-50/50 rounded-xl border dark:border-white/5 border-slate-200 flex items-center justify-between group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-slate-700/50 flex items-center justify-center text-slate-400">
+                                            <div className="w-10 h-10 rounded-full dark:bg-slate-700/50 bg-slate-200 flex items-center justify-center dark:text-slate-400 text-slate-500">
                                                 <Mail className="w-5 h-5" />
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-white">{invite.email}</p>
+                                                    <p className="font-medium dark:text-white text-slate-900">{invite.email}</p>
                                                     <span className={`text-[10px] px-2 py-0.5 rounded-full border ${invite.type === 'guest' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'}`}>
                                                         {invite.type.toUpperCase()}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-3 mt-1">
-                                                    <p className="text-xs text-slate-500">Role: <span className="text-slate-300 capitalize">{invite.role}</span></p>
-                                                    <p className="text-xs text-slate-500">Expires: <span className="text-slate-300">{new Date(invite.expiresAt).toLocaleDateString()}</span></p>
+                                                    <p className="text-xs text-slate-500">Role: <span className="dark:text-slate-300 text-slate-700 capitalize">{invite.role}</span></p>
+                                                    <p className="text-xs text-slate-500">Expires: <span className="dark:text-slate-300 text-slate-700">{new Date(invite.expiresAt).toLocaleDateString()}</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -495,9 +515,9 @@ export const UserManagement = () => {
                     )}
 
                     {/* Roles Section */}
-                    <Card className="p-6 bg-slate-900/50 backdrop-blur-xl border border-white/10">
+                    <Card className="p-6 dark:bg-slate-900/50 bg-white backdrop-blur-xl border dark:border-white/10 border-slate-200 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold text-white">Custom Roles</h2>
+                            <h2 className="text-lg font-semibold dark:text-white text-slate-900">Custom Roles</h2>
                             <Button size="sm" onClick={() => setShowCreateRoleModal(true)}>
                                 <Plus className="w-4 h-4 mr-1" />
                                 Create Role
@@ -505,9 +525,9 @@ export const UserManagement = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {roles.map(role => (
-                                <div key={role.id} className="p-3 bg-slate-800/50 rounded-lg border border-white/10 flex items-center justify-between">
+                                <div key={role.id} className="p-3 dark:bg-slate-800/50 bg-slate-50/50 rounded-lg border dark:border-white/10 border-slate-200 shadow-sm flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-white">{role.name}</p>
+                                        <p className="font-medium dark:text-white text-slate-900">{role.name}</p>
                                         <p className="text-xs text-slate-400">{users.filter(u => u.roleName === role.name).length} users</p>
                                     </div>
                                     {!['admin', 'member'].includes(role.name) && (

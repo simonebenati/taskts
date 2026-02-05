@@ -8,6 +8,7 @@ export interface TokenPayload {
     tenantId: string
     roleId: string
     roleName: string
+    groupId?: string | null
     iat: number
     exp: number
 }
@@ -53,6 +54,7 @@ export interface AuthResponse {
         surname: string
         tenantId: string
         roleName: string
+        groupId?: string | null
         tenantName?: string
     }
 }

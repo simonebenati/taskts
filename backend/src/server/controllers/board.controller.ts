@@ -23,7 +23,10 @@ export async function createBoard(
             name,
             description,
             tenantId,
-            ownerId: userId
+            ownerId: userId,
+            // For non-admins, always associate with their group. 
+            // Admins can specify a groupId or leave it null.
+            groupId: req.user.roleName === 'admin' ? (req.body.groupId || null) : req.user.groupId
         }
     })
 
@@ -33,6 +36,7 @@ export async function createBoard(
         description: board.description,
         ownerId: board.ownerId,
         tenantId: board.tenantId,
+        groupId: board.groupId,
         createdAt: board.createdAt,
         updatedAt: board.updatedAt,
         taskCount: 0
@@ -57,12 +61,24 @@ export async function getBoards(
     req: AuthenticatedRequest,
     res: Response<{ success: true; data: BoardResponse[] }>
 ): Promise<void> {
-    const { tenantId } = req.user
+    const { tenantId, roleName, groupId: userGroupId } = req.user
 
     const boards = await prisma.board.findMany({
-        where: { tenantId },
+        where: {
+            tenantId,
+            ...(roleName !== 'admin' && {
+                OR: [
+                    // Boards in the user's group
+                    { groupId: userGroupId },
+                    // Private boards (no group) owned by the user
+                    { AND: [{ groupId: null }, { ownerId: req.user.userId }] }
+                ]
+            })
+        },
         include: {
-            _count: { select: { tasks: true } }
+            _count: { select: { tasks: true } },
+            group: { select: { id: true, name: true } },
+            owner: { select: { id: true, email: true, name: true, surname: true, tenantId: true, groupId: true, group: { select: { id: true, name: true } } } }
         },
         orderBy: { createdAt: "desc" }
     })
@@ -73,9 +89,20 @@ export async function getBoards(
         description: board.description,
         ownerId: board.ownerId,
         tenantId: board.tenantId,
+        groupId: board.groupId,
+        group: board.group,
         createdAt: board.createdAt,
         updatedAt: board.updatedAt,
-        taskCount: board._count.tasks
+        taskCount: board._count.tasks,
+        owner: board.owner ? {
+            id: board.owner.id,
+            email: board.owner.email,
+            name: board.owner.name,
+            surname: board.owner.surname,
+            tenantId: board.owner.tenantId,
+            groupId: board.owner.groupId,
+            group: board.owner.group
+        } : undefined
     }))
 
     res.status(200).json({
@@ -98,10 +125,25 @@ export async function getBoard(
     const { id } = req.params
 
     const board = await prisma.board.findFirst({
-        where: { id, tenantId },
+        where: {
+            id,
+            tenantId,
+            ...(req.user.roleName !== 'admin' && {
+                OR: [
+                    { groupId: req.user.groupId },
+                    { AND: [{ groupId: null }, { ownerId: req.user.userId }] }
+                ]
+            })
+        },
         include: {
             _count: { select: { tasks: true } },
-            owner: true
+            owner: {
+                include: {
+                    group: true,
+                    role: true
+                }
+            },
+            group: true
         }
     })
 
@@ -117,6 +159,8 @@ export async function getBoard(
             description: board.description,
             ownerId: board.ownerId,
             tenantId: board.tenantId,
+            groupId: board.groupId,
+            group: board.group,
             createdAt: board.createdAt,
             updatedAt: board.updatedAt,
             taskCount: board._count.tasks,
@@ -126,7 +170,9 @@ export async function getBoard(
                 name: board.owner.name,
                 surname: board.owner.surname,
                 tenantId: board.owner.tenantId,
-                roleName: "unknown" // We don't fetch role here, or need to include it
+                roleName: board.owner.role.name,
+                groupId: board.owner.groupId,
+                group: board.owner.group
             }
         }
     })
@@ -177,6 +223,7 @@ export async function updateBoard(
         description: board.description,
         ownerId: board.ownerId,
         tenantId: board.tenantId,
+        groupId: board.groupId,
         createdAt: board.createdAt,
         updatedAt: board.updatedAt,
         taskCount: board._count.tasks

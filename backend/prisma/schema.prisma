@@ -2,7 +2,7 @@
 // Multi-tenant collaborative todo application with row-level tenancy
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -78,8 +78,9 @@ model Group {
   description String? @db.VarChar(500)
   tenantId    String  @db.Uuid
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   users  User[]
+  boards Board[]
 
   @@index([tenantId])
 }
@@ -133,17 +134,20 @@ model Board {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Foreign keys (multi-tenancy)
-  tenantId String @db.Uuid
-  ownerId  String @db.Uuid
+  // Foreign keys
+  tenantId String  @db.Uuid
+  ownerId  String  @db.Uuid
+  groupId  String? @db.Uuid
 
   // Relations
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   owner  User   @relation("BoardOwner", fields: [ownerId], references: [id])
+  group  Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
   tasks  Task[]
 
   @@index([tenantId])
   @@index([ownerId])
+  @@index([groupId])
 }
 
 /// Task status enum

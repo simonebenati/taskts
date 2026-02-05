@@ -29,6 +29,7 @@ export const BoardDetail = () => {
     // Task Detail Modal State
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
     // Board Management State
     const [isEditingBoard, setIsEditingBoard] = useState(false);
@@ -156,11 +157,12 @@ export const BoardDetail = () => {
         }
     };
 
-    const handleDeleteTask = async (taskId: string) => {
-        if (!window.confirm('Are you sure?')) return;
+    const handleDeleteTask = async () => {
+        if (!taskToDelete) return;
         try {
-            await api.delete(`/boards/${boardId}/tasks/${taskId}`);
-            setTasks(prev => prev.filter(t => t.id !== taskId));
+            await api.delete(`/boards/${boardId}/tasks/${taskToDelete.id}`);
+            setTasks(prev => prev.filter(t => t.id !== taskToDelete.id));
+            setTaskToDelete(null);
         } catch (err) {
             console.error(err);
         }
@@ -280,7 +282,7 @@ export const BoardDetail = () => {
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight dark:text-white text-slate-900 mt-1 flex items-center gap-3">
                             {board.name}
-                            <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/5">
+                            <span className="text-xs font-normal px-2 py-0.5 rounded-full dark:bg-slate-800 bg-slate-100 dark:text-slate-400 text-slate-500 border dark:border-white/5 border-slate-200">
                                 {board.ownerId === user?.id ? 'Owner' : 'Member'}
                             </span>
                         </h1>
@@ -298,10 +300,10 @@ export const BoardDetail = () => {
                                 </Button>
                             </>
                         )}
-                        <div className="ml-4 pl-4 border-l border-white/10 flex items-center gap-4">
+                        <div className="ml-4 pl-4 border-l dark:border-white/10 border-slate-200 flex items-center gap-4">
                             <button
                                 onClick={() => window.dispatchEvent(new Event('open-search'))}
-                                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors border border-transparent hover:border-slate-700"
+                                className="p-2 dark:text-slate-400 text-slate-500 dark:hover:text-white hover:text-slate-900 dark:hover:bg-slate-800 hover:bg-slate-100 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700 hover:border-slate-200"
                                 title="Search (Cmd+K)"
                             >
                                 <Search className="w-5 h-5" />
@@ -326,7 +328,7 @@ export const BoardDetail = () => {
                         required
                     />
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300">Description</label>
+                        <label className="text-sm font-medium dark:text-slate-300 text-slate-700">Description</label>
                         <textarea
                             className="input min-h-[100px] resize-none"
                             value={editBoardDescription}
@@ -351,9 +353,9 @@ export const BoardDetail = () => {
                     <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                         <AlertTriangle className="w-6 h-6 text-red-500" />
                     </div>
-                    <h3 className="text-lg font-medium text-white mb-2">Are you sure?</h3>
-                    <p className="text-slate-400 mb-6">
-                        This action cannot be undone. This will permanently delete the board <span className="text-white font-medium">"{board.name}"</span> and all {tasks.length} tasks inside it.
+                    <h3 className="text-lg font-medium dark:text-white text-slate-900 mb-2">Are you sure?</h3>
+                    <p className="dark:text-slate-400 text-slate-600 mb-6">
+                        This action cannot be undone. This will permanently delete the board <span className="dark:text-white text-slate-900 font-medium">"{board.name}"</span> and all {tasks.length} tasks inside it.
                     </p>
                     <div className="flex justify-center gap-3">
                         <Button type="button" variant="ghost" onClick={() => setIsDeletingBoard(false)}>Cancel</Button>
@@ -366,10 +368,10 @@ export const BoardDetail = () => {
                 <div className="flex-1 overflow-x-auto">
                     <div className="flex gap-6 h-full min-w-[1024px] px-6 pb-4">
                         {columnsDisplay.map((col, colIndex) => (
-                            <div key={col.id} className={cn("glass-panel flex-1 flex flex-col rounded-xl min-w-[300px]", "bg-slate-900/40 backdrop-blur-xl border border-white/10")}>
-                                <div className={cn("p-4 border-b border-white/5 flex justify-between items-center bg-slate-800/30", col.color)}>
+                            <div key={col.id} className={cn("glass-panel flex-1 flex flex-col rounded-xl min-w-[300px]", "dark:bg-slate-900/40 bg-white/50 backdrop-blur-xl dark:border-white/10 border-slate-300/50 shadow-sm")}>
+                                <div className={cn("p-4 dark:border-b border-b dark:border-white/5 border-slate-200 flex justify-between items-center dark:bg-slate-800/30 bg-slate-50/50", col.color)}>
                                     <h2 className="font-semibold dark:text-slate-200 text-slate-800 tracking-wide">{col.label}</h2>
-                                    <span className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                                    <span className="text-xs px-2 py-1 rounded dark:bg-slate-800 bg-white dark:text-slate-400 text-slate-500 border dark:border-slate-700 border-slate-200 shadow-sm">
                                         {tasks.filter(t => t.status === col.id).length}
                                     </span>
                                 </div>
@@ -380,7 +382,7 @@ export const BoardDetail = () => {
                                             <div
                                                 {...provided.droppableProps}
                                                 ref={provided.innerRef}
-                                                className={cn("space-y-3 min-h-[100px] transition-colors rounded-lg", snapshot.isDraggingOver ? "bg-slate-800/30" : "")}
+                                                className={cn("space-y-3 min-h-[100px] transition-colors rounded-lg", snapshot.isDraggingOver ? "dark:bg-slate-800/30 bg-indigo-50/50" : "")}
                                             >
                                                 {tasks
                                                     .filter(t => t.status === col.id)
@@ -395,7 +397,7 @@ export const BoardDetail = () => {
                                                                 >
                                                                     <TaskCard
                                                                         task={task}
-                                                                        onDelete={handleDeleteTask}
+                                                                        onDelete={() => setTaskToDelete(task)}
                                                                         onMove={handleMoveTask}
                                                                         onClick={handleTaskClick}
                                                                         isFirstColumn={colIndex === 0}
@@ -429,7 +431,7 @@ export const BoardDetail = () => {
                                     ) : (
                                         <button
                                             onClick={() => setAddingToColumn(col.id)}
-                                            className="w-full mt-3 py-2 flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg border border-dashed border-slate-700 hover:border-blue-500/50 transition-all group"
+                                            className="w-full mt-3 py-2 flex items-center justify-center gap-2 text-sm dark:text-slate-400 text-slate-500 dark:hover:text-blue-400 hover:text-blue-600 dark:hover:bg-slate-800/50 hover:bg-blue-50/50 rounded-lg border border-dashed dark:border-slate-700 border-slate-300 dark:hover:border-blue-500/50 hover:border-blue-400 transition-all group shadow-sm bg-white/30 dark:bg-transparent"
                                         >
                                             <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                             Add Task
@@ -451,6 +453,27 @@ export const BoardDetail = () => {
                     tenantUsers={users}
                 />
             )}
+
+            <Modal
+                isOpen={!!taskToDelete}
+                onClose={() => setTaskToDelete(null)}
+                title="Delete Task"
+                className="max-w-md border-red-500/20"
+            >
+                <div className="text-center p-2">
+                    <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-medium dark:text-white text-slate-900 mb-2">Are you sure?</h3>
+                    <p className="dark:text-slate-400 text-slate-600 mb-6">
+                        This action cannot be undone. This will permanently delete the task <span className="dark:text-white text-slate-900 font-medium">"{taskToDelete?.title}"</span>.
+                    </p>
+                    <div className="flex justify-center gap-3">
+                        <Button type="button" variant="ghost" onClick={() => setTaskToDelete(null)}>Cancel</Button>
+                        <Button type="button" variant="danger" onClick={handleDeleteTask}>Yes, Delete Task</Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

@@ -208,7 +208,15 @@ export async function updateUserRole(
   const updatedUser = await prisma.user.update({
     where: { id },
     data: { roleId: newRole.id },
-    include: { role: true }
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      surname: true,
+      isActive: true,
+      role: { select: { name: true } },
+      group: { select: { id: true, name: true } }
+    }
   })
 
   res.status(200).json({
