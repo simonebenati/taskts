@@ -17,8 +17,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         const variants = {
             primary: 'btn-primary',
             secondary: 'btn-secondary',
-            danger: 'bg-red-500 hover:bg-red-600 text-white',
-            ghost: 'bg-transparent hover:bg-slate-800 text-slate-300',
+            danger: 'btn-danger',
+            ghost: 'btn-ghost',
         };
 
         const sizes = {
@@ -67,12 +67,44 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }
 );
 
-interface CardProps {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     className?: string;
     hoverEffect?: boolean;
 }
 
-export const Card = ({ children, className, hoverEffect = false }: CardProps) => (
-    <div className={cn('card', hoverEffect && 'card-interactive', className)}>{children}</div>
+export const Card = ({ children, className, hoverEffect = false, ...props }: CardProps) => (
+    <div className={cn('card', hoverEffect && 'card-interactive', className)} {...props}>{children}</div>
 );
+
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    title?: string;
+    children: React.ReactNode;
+    className?: string;
+}
+
+export const Modal = ({ isOpen, onClose, title, children, className }: ModalProps) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={onClose} />
+            <div className={cn("relative w-full max-w-lg bg-slate-800/90 border border-white/10 rounded-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200", className)}>
+                <div className="flex items-center justify-between p-4 border-b border-white/5">
+                    {title && <h3 className="text-lg font-semibold font-display tracking-tight text-white">{title}</h3>}
+                    <button onClick={onClose} className="rounded-md p-1 hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+                        <span className="sr-only">Close</span>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="p-6">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+};

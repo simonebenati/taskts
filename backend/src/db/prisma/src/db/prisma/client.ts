@@ -60,6 +60,11 @@ export type Group = Prisma.GroupModel
  */
 export type Role = Prisma.RoleModel
 /**
+ * Model Invite
+ * Invitations for users to join a tenant
+ */
+export type Invite = Prisma.InviteModel
+/**
  * Model Board
  * Board / Project within a tenant
  */

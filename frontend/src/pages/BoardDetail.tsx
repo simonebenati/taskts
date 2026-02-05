@@ -1,50 +1,88 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
-import { type Board, type Task, TaskStatus } from '../types';
-import { Card, Button, Input, cn } from '../components/ui';
+import { useAuth } from '../contexts/AuthContext';
+import { type Board, type Task, TaskStatus, type User } from '../types';
+import { Button, Input, Modal, cn } from '../components/ui';
+import { TaskCard } from '../components/TaskCard';
+import { TaskDetailModal } from '../components/TaskDetailModal';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { Plus, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
-
-// Status Columns
-const COLUMNS = [
-    { id: TaskStatus.TODO, label: 'To Do', color: 'bg-slate-700/50' },
-    { id: TaskStatus.IN_PROGRESS, label: 'In Progress', color: 'bg-blue-900/20' },
-    { id: TaskStatus.DONE, label: 'Done', color: 'bg-green-900/20' }
-];
+import { Plus, ArrowLeft, Edit2, Trash2, AlertTriangle, X, Search } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import { UserMenu } from '../components/UserMenu';
 
 export const BoardDetail = () => {
-    const { boardId } = useParams();
+    const { boardId } = useParams<{ boardId: string }>();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
     const [board, setBoard] = useState<Board | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Create Task State
-    const [isCreating, setIsCreating] = useState<TaskStatus | null>(null);
+    // Task Creation State
+    const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
     const [newTaskTitle, setNewTaskTitle] = useState('');
+
+    // Task Detail Modal State
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+    // Board Management State
+    const [isEditingBoard, setIsEditingBoard] = useState(false);
+    const [isDeletingBoard, setIsDeletingBoard] = useState(false);
+    const [editBoardName, setEditBoardName] = useState('');
+    const [editBoardDescription, setEditBoardDescription] = useState('');
 
     const token = localStorage.getItem('token');
 
-    // Fetch Initial Data
+    // Fetch Board & Tasks
+    const fetchBoardData = async () => {
+        try {
+            console.log('Fetching board data for', boardId);
+            const [boardRes, tasksRes] = await Promise.all([
+                api.get<{ success: boolean; data: Board }>(`/boards/${boardId}`),
+                api.get<{ success: boolean; data: Task[] }>(`/boards/${boardId}/tasks`)
+            ]);
+            console.log('Got board:', boardRes.data);
+            console.log('Got tasks:', tasksRes.data);
+            setBoard(boardRes.data.data);
+            setTasks(tasksRes.data.data);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to load board');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch Users (for assignment)
+    const fetchUsers = async () => {
+        try {
+            const res = await api.get<{ success: boolean; data: User[] }>('/users');
+            setUsers(res.data.data);
+        } catch (err) {
+            console.error("Failed to fetch users", err);
+        }
+    };
+
+    // Initial Load
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [boardRes, tasksRes] = await Promise.all([
-                    api.get<{ success: boolean, data: Board }>(`/boards/${boardId}`),
-                    api.get<{ success: boolean, data: Task[] }>(`/boards/${boardId}/tasks`)
-                ]);
-                setBoard(boardRes.data.data);
-                setTasks(tasksRes.data.data);
-            } catch (err) {
-                console.error(err);
-                setError('Failed to load board');
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (boardId) fetchData();
+        if (boardId) {
+            fetchBoardData();
+            fetchUsers();
+        }
     }, [boardId]);
+
+    // Initial Edit State
+    useEffect(() => {
+        if (board) {
+            setEditBoardName(board.name);
+            setEditBoardDescription(board.description || '');
+        }
+    }, [board]);
 
     // SSE Subscription
     useEffect(() => {
@@ -55,67 +93,71 @@ export const BoardDetail = () => {
             await fetchEventSource('/api/rt/events', {
                 method: 'GET',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`
                 },
                 signal: controller.signal,
                 onmessage(ev) {
-                    if (ev.event === 'connected' || ev.event === 'heartbeat') return;
-
                     try {
-                        const payload = JSON.parse(ev.data);
-                        const type = payload.type.toLowerCase();
-                        const data = payload.data as Task;
+                        const data = JSON.parse(ev.data);
+                        console.log('SSE Event received:', data);
 
-                        // Filter events for THIS board
-                        if (data.boardId && data.boardId !== boardId) return;
+                        // Skip heartbeat and connected events
+                        if (data.type === 'connected' || data.type === 'heartbeat') return;
 
-                        if (type.includes('task:created')) {
-                            setTasks(prev => {
-                                if (prev.some(t => t.id === data.id)) return prev;
-                                return [...prev, data];
-                            });
-                        } else if (type.includes('task:updated')) {
-                            setTasks(prev => prev.map(t => t.id === data.id ? data : t));
-                        } else if (type.includes('task:deleted')) {
-                            setTasks(prev => prev.filter(t => t.id !== (data.id || (payload.data as any).taskId)));
+                        // Handle task events
+                        if (data.type === 'task_created' || data.type === 'task_updated' || data.type === 'task_deleted') {
+                            // data.data contains the actual task/board data
+                            if (data.data?.boardId === boardId || data.data?.id === boardId) {
+                                console.log('Task event for this board, refreshing...');
+                                fetchBoardData();
+                            }
                         }
 
+                        // Handle board events
+                        if (data.type === 'board_updated' && data.data?.id === boardId) {
+                            console.log('Board updated, refreshing...');
+                            fetchBoardData();
+                        }
+                        if (data.type === 'board_deleted' && data.data?.id === boardId) {
+                            console.log('Board deleted, redirecting...');
+                            navigate('/');
+                        }
                     } catch (e) {
-                        console.error('SSE Error', e);
+                        console.error("SSE Parse Error", e);
                     }
                 },
-                onerror(_err) {
-                    // Do nothing, standard retry
+                onerror(err) {
+                    console.error("SSE Error", err);
                 }
             });
         };
 
         fetchData();
-
         return () => controller.abort();
-    }, [boardId, token]);
+    }, [boardId, token, navigate]);
 
-    const handleCreateTask = async (status: TaskStatus) => {
-        if (!newTaskTitle.trim()) return;
+    const handleCreateTask = async (e: FormEvent) => {
+        e.preventDefault();
+        console.log('Creating task:', newTaskTitle, 'in', addingToColumn);
+        if (!newTaskTitle.trim() || !addingToColumn) return;
+
         try {
-            await api.post(`/boards/${boardId}/tasks`, {
+            const res = await api.post(`/boards/${boardId}/tasks`, {
                 title: newTaskTitle,
-                status
+                status: addingToColumn,
+                currentBoardId: boardId
             });
-            // Task will update via SSE or fetch
+            console.log('Create task response:', res.data);
             setNewTaskTitle('');
-            setIsCreating(null);
-
-            // Refetch to be safe (SSE delay)
-            const { data } = await api.get<{ success: boolean, data: Task[] }>(`/boards/${boardId}/tasks`);
-            setTasks(data.data);
+            setAddingToColumn(null);
+            fetchBoardData(); // Refresh
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleDelete = async (taskId: string) => {
-        if (!confirm('Delete this task?')) return;
+    const handleDeleteTask = async (taskId: string) => {
+        if (!window.confirm('Are you sure?')) return;
         try {
             await api.delete(`/boards/${boardId}/tasks/${taskId}`);
             setTasks(prev => prev.filter(t => t.id !== taskId));
@@ -124,136 +166,291 @@ export const BoardDetail = () => {
         }
     };
 
-    const handleMove = async (task: Task, direction: 'forward' | 'backward') => {
-        const currentIndex = COLUMNS.findIndex(c => c.id === task.status);
-        if (currentIndex === -1) return;
-
+    const handleMoveTask = async (task: Task, direction: 'forward' | 'backward') => {
+        const statuses = Object.values(TaskStatus);
+        const currentIndex = statuses.indexOf(task.status);
         const newIndex = direction === 'forward' ? currentIndex + 1 : currentIndex - 1;
-        if (newIndex < 0 || newIndex >= COLUMNS.length) return;
 
-        const newStatus = COLUMNS[newIndex].id;
+        if (newIndex >= 0 && newIndex < statuses.length) {
+            const newStatus = statuses[newIndex];
+            const oldStatus = task.status;
 
-        // Optimistic update
-        setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
+            // Optimistic update
+            const updatedTask = { ...task, status: newStatus };
+            setTasks(prev => prev.map(t => t.id === task.id ? updatedTask : t));
 
-        try {
-            await api.put(`/boards/${boardId}/tasks/${task.id}`, {
-                status: newStatus
-            });
-        } catch (err) {
-            console.error(err);
-            // Revert
-            setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: task.status } : t));
+            try {
+                await api.put(`/boards/${boardId}/tasks/${task.id}`, { status: newStatus });
+            } catch (err) {
+                console.error(err);
+                // Revert
+                setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: oldStatus } : t));
+            }
         }
     };
 
-    if (loading) return <div className="text-center py-20">Loading Board...</div>;
+    const onDragEnd = async (result: DropResult) => {
+        const { destination, source, draggableId } = result;
+
+        if (!destination) return;
+        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+        const newStatus = destination.droppableId as TaskStatus;
+        const task = tasks.find(t => t.id === draggableId);
+        if (!task) return;
+
+        const oldStatus = task.status;
+
+        // Optimistic Update
+        setTasks(prev => prev.map(t =>
+            t.id === draggableId ? { ...t, status: newStatus } : t
+        ));
+
+        try {
+            await api.put(`/boards/${boardId}/tasks/${draggableId}`, { status: newStatus });
+        } catch (err) {
+            console.error("Failed to move task", err);
+            // Revert
+            setTasks(prev => prev.map(t => t.id === draggableId ? { ...t, status: oldStatus } : t));
+        }
+    };
+
+    const handleTaskClick = (task: Task) => {
+        setSelectedTask(task);
+        setIsTaskModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsTaskModalOpen(false);
+        setSelectedTask(null);
+    };
+
+    const handleTaskUpdate = (updatedTask: Task) => {
+        setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
+        if (selectedTask?.id === updatedTask.id) {
+            setSelectedTask(updatedTask);
+        }
+    };
+
+    const handleUpdateBoard = async (e: FormEvent) => {
+        e.preventDefault();
+        try {
+            const { data } = await api.put(`/boards/${boardId}`, {
+                name: editBoardName,
+                description: editBoardDescription
+            });
+            setBoard(prev => prev ? { ...prev, name: data.data.name, description: data.data.description } : null);
+            setIsEditingBoard(false);
+        } catch (err) {
+            console.error('Failed to update board', err);
+        }
+    };
+
+    const handleDeleteBoard = async () => {
+        try {
+            await api.delete(`/boards/${boardId}`);
+            navigate('/');
+        } catch (err) {
+            console.error('Failed to delete board', err);
+        }
+    };
+
+    const canManageBoard = user?.roleName === 'admin' || user?.id === board?.ownerId;
+
+    if (loading) return <div className="text-center py-20 text-slate-500">Loading board...</div>;
     if (error || !board) return <div className="text-center py-20 text-red-400">{error || 'Board not found'}</div>;
 
+    const columnsDisplay = [
+        { id: TaskStatus.TODO, label: 'To Do', color: 'border-l-4 border-l-blue-500' },
+        { id: TaskStatus.IN_PROGRESS, label: 'In Progress', color: 'border-l-4 border-l-yellow-500' },
+        { id: TaskStatus.DONE, label: 'Done', color: 'border-l-4 border-l-green-500' },
+    ];
+
     return (
-        <div className="container py-8 h-[calc(100vh-64px)] flex flex-col">
-            <div className="mb-6">
-                <Link to="/" className="text-slate-400 hover:text-white mb-2 inline-block text-sm">&larr; Back to Dashboard</Link>
-                <div className="flex justify-between items-start">
+        <div className="min-h-screen app-bg flex flex-col">
+            {/* Header */}
+            <header className="border-b dark:border-white/5 border-slate-200 dark:bg-slate-900/50 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                <div className="w-full h-20 flex items-center justify-between px-6">
                     <div>
-                        <h1 className="text-3xl font-bold font-display tracking-tight text-white">{board.name}</h1>
-                        {board.description && <p className="text-slate-400 mt-1">{board.description}</p>}
+                        <div className="flex items-center gap-4">
+                            <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="-ml-2 dark:text-slate-400 text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                                <ArrowLeft className="w-4 h-4 mr-1" />
+                                Back
+                            </Button>
+                        </div>
+                        <h1 className="text-2xl font-bold tracking-tight dark:text-white text-slate-900 mt-1 flex items-center gap-3">
+                            {board.name}
+                            <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/5">
+                                {board.ownerId === user?.id ? 'Owner' : 'Member'}
+                            </span>
+                        </h1>
                     </div>
-                    <div className="text-xs text-slate-500">
-                        Host: {board.owner.name}
+
+                    <div className="flex items-center gap-2">
+                        {canManageBoard && (
+                            <>
+                                <Button variant="ghost" size="sm" onClick={() => setIsEditingBoard(true)}>
+                                    <Edit2 className="w-4 h-4 mr-2" />
+                                    Settings
+                                </Button>
+                                <Button variant="danger" size="sm" onClick={() => setIsDeletingBoard(true)}>
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </>
+                        )}
+                        <div className="ml-4 pl-4 border-l border-white/10 flex items-center gap-4">
+                            <button
+                                onClick={() => window.dispatchEvent(new Event('open-search'))}
+                                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors border border-transparent hover:border-slate-700"
+                                title="Search (Cmd+K)"
+                            >
+                                <Search className="w-5 h-5" />
+                            </button>
+                            <UserMenu />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="flex-1 overflow-x-auto">
-                <div className="flex gap-6 h-full min-w-[1000px]">
-                    {COLUMNS.map(col => {
-                        const colTasks = tasks.filter(t => t.status === col.id);
-                        return (
-                            <div key={col.id} className={cn("flex-1 flex flex-col rounded-xl glass-panel border-none",
-                                col.id === TaskStatus.TODO ? "bg-slate-900/40" :
-                                    col.id === TaskStatus.IN_PROGRESS ? "bg-blue-900/10" :
-                                        "bg-green-900/10"
-                            )}>
-                                <div className="p-4 border-b border-white/5 flex justify-between items-center rounded-t-xl backdrop-blur-md">
-                                    <h3 className="font-semibold flex items-center gap-2 font-display tracking-tight text-white">
-                                        <div className={cn("w-2 h-2 rounded-full ring-2 ring-offset-2 ring-offset-slate-900",
-                                            col.id === 'DONE' ? "bg-green-500 ring-green-500/30" :
-                                                col.id === 'IN_PROGRESS' ? "bg-blue-500 ring-blue-500/30" :
-                                                    "bg-slate-400 ring-slate-400/30")} />
-                                        {col.label}
-                                        <span className="text-xs font-normal text-slate-400 bg-white/5 px-2 py-0.5 rounded-full ml-2 border border-white/5">{colTasks.length}</span>
-                                    </h3>
-                                    <Button variant="ghost" size="sm" onClick={() => setIsCreating(col.id)} title="Add Task" className="hover:bg-white/10 text-slate-400 hover:text-white">
-                                        <Plus className="w-4 h-4" />
-                                    </Button>
+            {/* Board Management Modals */}
+            <Modal
+                isOpen={isEditingBoard}
+                onClose={() => setIsEditingBoard(false)}
+                title="Edit Board Settings"
+            >
+                <form onSubmit={handleUpdateBoard} className="space-y-4">
+                    <Input
+                        label="Board Name"
+                        value={editBoardName}
+                        onChange={(e) => setEditBoardName(e.target.value)}
+                        required
+                    />
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-slate-300">Description</label>
+                        <textarea
+                            className="input min-h-[100px] resize-none"
+                            value={editBoardDescription}
+                            onChange={(e) => setEditBoardDescription(e.target.value)}
+                            placeholder="What's this board about?"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="button" variant="ghost" onClick={() => setIsEditingBoard(false)}>Cancel</Button>
+                        <Button type="submit">Save Changes</Button>
+                    </div>
+                </form>
+            </Modal>
+
+            <Modal
+                isOpen={isDeletingBoard}
+                onClose={() => setIsDeletingBoard(false)}
+                title="Delete Board"
+                className="max-w-md border-red-500/20"
+            >
+                <div className="text-center p-2">
+                    <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-medium text-white mb-2">Are you sure?</h3>
+                    <p className="text-slate-400 mb-6">
+                        This action cannot be undone. This will permanently delete the board <span className="text-white font-medium">"{board.name}"</span> and all {tasks.length} tasks inside it.
+                    </p>
+                    <div className="flex justify-center gap-3">
+                        <Button type="button" variant="ghost" onClick={() => setIsDeletingBoard(false)}>Cancel</Button>
+                        <Button type="button" variant="danger" onClick={handleDeleteBoard}>Yes, Delete Board</Button>
+                    </div>
+                </div>
+            </Modal>
+
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div className="flex-1 overflow-x-auto">
+                    <div className="flex gap-6 h-full min-w-[1024px] px-6 pb-4">
+                        {columnsDisplay.map((col, colIndex) => (
+                            <div key={col.id} className={cn("glass-panel flex-1 flex flex-col rounded-xl min-w-[300px]", "bg-slate-900/40 backdrop-blur-xl border border-white/10")}>
+                                <div className={cn("p-4 border-b border-white/5 flex justify-between items-center bg-slate-800/30", col.color)}>
+                                    <h2 className="font-semibold dark:text-slate-200 text-slate-800 tracking-wide">{col.label}</h2>
+                                    <span className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                                        {tasks.filter(t => t.status === col.id).length}
+                                    </span>
                                 </div>
 
-                                <div className="p-4 flex-1 overflow-y-auto space-y-3 custom-scrollbar">
-                                    {isCreating === col.id && (
-                                        <Card className="mb-4 animate-in fade-in slide-in-from-top-2 border-primary/50 bg-slate-800/90 shadow-lg">
-                                            <form onSubmit={(e: FormEvent) => { e.preventDefault(); handleCreateTask(col.id); }}>
-                                                <Input
-                                                    autoFocus
-                                                    placeholder="Task title..."
-                                                    value={newTaskTitle}
-                                                    onChange={e => setNewTaskTitle(e.target.value)}
-                                                    className="mb-3 bg-slate-900/50"
-                                                />
-                                                <div className="flex justify-end gap-2">
-                                                    <Button type="button" variant="ghost" size="sm" onClick={() => { setIsCreating(null); setNewTaskTitle(''); }}>Cancel</Button>
-                                                    <Button type="submit" size="sm">Add</Button>
-                                                </div>
-                                            </form>
-                                        </Card>
-                                    )}
+                                <div className="flex-1 p-3 overflow-y-auto custom-scrollbar">
+                                    <Droppable droppableId={col.id}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                                className={cn("space-y-3 min-h-[100px] transition-colors rounded-lg", snapshot.isDraggingOver ? "bg-slate-800/30" : "")}
+                                            >
+                                                {tasks
+                                                    .filter(t => t.status === col.id)
+                                                    .map((task, index) => (
+                                                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                            {(provided) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    style={{ ...provided.draggableProps.style }}
+                                                                >
+                                                                    <TaskCard
+                                                                        task={task}
+                                                                        onDelete={handleDeleteTask}
+                                                                        onMove={handleMoveTask}
+                                                                        onClick={handleTaskClick}
+                                                                        isFirstColumn={colIndex === 0}
+                                                                        isLastColumn={colIndex === columnsDisplay.length - 1}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
 
-                                    {colTasks.map(task => (
-                                        <Card key={task.id} hoverEffect className="group p-3 animate-in fade-in duration-300">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <p className="font-medium text-sm leading-snug">{task.title}</p>
-                                                <Button variant="ghost" className="h-6 w-6 p-0 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(task.id)}>
-                                                    <Trash2 className="w-3 h-3" />
+                                    {addingToColumn === col.id ? (
+                                        <form onSubmit={handleCreateTask} className="mt-3 animate-in fade-in zoom-in-95 duration-200">
+                                            <Input
+                                                autoFocus
+                                                value={newTaskTitle}
+                                                onChange={(e) => setNewTaskTitle(e.target.value)}
+                                                placeholder="Task title..."
+                                                className="mb-2 bg-slate-800 border-slate-600 focus:border-blue-500"
+                                            />
+                                            <div className="flex gap-2">
+                                                <Button type="submit" size="sm" className="flex-1">Add</Button>
+                                                <Button type="button" variant="ghost" size="sm" onClick={() => setAddingToColumn(null)}>
+                                                    <X className="w-4 h-4" />
                                                 </Button>
                                             </div>
-                                            {task.description && <p className="text-xs text-slate-400 line-clamp-2 mb-3">{task.description}</p>}
-
-                                            <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
-                                                <div className="text-[10px] text-slate-500 truncate max-w-[80px] flex items-center gap-1">
-                                                    <div className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[8px] text-white font-bold">
-                                                        {(task.assignee?.name || 'U').charAt(0)}
-                                                    </div>
-                                                    {task.assignee ? task.assignee.name : 'Unassigned'}
-                                                </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {col.id !== TaskStatus.TODO && (
-                                                        <button
-                                                            onClick={() => handleMove(task, 'backward')}
-                                                            className="p-1 hover:bg-slate-700 rounded text-slate-400 hover:text-blue-400 transition-colors"
-                                                            title="Move Back"
-                                                        >
-                                                            <ArrowLeft className="w-3 h-3" />
-                                                        </button>
-                                                    )}
-                                                    {col.id !== TaskStatus.DONE && (
-                                                        <button
-                                                            onClick={() => handleMove(task, 'forward')}
-                                                            className="p-1 hover:bg-slate-700 rounded text-slate-400 hover:text-blue-400 transition-colors"
-                                                            title="Move Forward"
-                                                        >
-                                                            <ArrowRight className="w-3 h-3" />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    ))}
+                                        </form>
+                                    ) : (
+                                        <button
+                                            onClick={() => setAddingToColumn(col.id)}
+                                            className="w-full mt-3 py-2 flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-blue-400 hover:bg-slate-800/50 rounded-lg border border-dashed border-slate-700 hover:border-blue-500/50 transition-all group"
+                                        >
+                                            <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                            Add Task
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-                        );
-                    })}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            </DragDropContext>
+
+            {selectedTask && (
+                <TaskDetailModal
+                    task={selectedTask}
+                    isOpen={isTaskModalOpen}
+                    onClose={handleModalClose}
+                    onUpdate={handleTaskUpdate}
+                    tenantUsers={users}
+                />
+            )}
         </div>
     );
 };

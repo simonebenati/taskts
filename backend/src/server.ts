@@ -12,7 +12,10 @@ import userRouter from "./server/routes/user.routes.js"
 import boardRouter from "./server/routes/board.routes.js"
 import taskRouter from "./server/routes/task.routes.js"
 import roleRouter from "./server/routes/role.routes.js"
+import groupRouter from "./server/routes/group.routes.js"
+import inviteRouter from "./server/routes/invite.routes.js"
 import rtRouter from "./server/routes/rt.routes.js"
+import searchRouter from "./server/routes/global_search.routes.js"
 
 const app = express()
 app.use(express.json())
@@ -29,7 +32,10 @@ app.use("/users", userRouter)          // User management (profile, list users)
 app.use("/boards", boardRouter)        // Board CRUD
 app.use("/boards/:boardId/tasks", taskRouter)  // Task CRUD (nested under boards)
 app.use("/roles", roleRouter)          // Role management
+app.use("/groups", groupRouter)        // Group management
+app.use("/invites", inviteRouter)      // Invite management
 app.use("/rt", rtRouter)               // Real-time SSE events
+app.use("/search", searchRouter)       // Global Search
 
 // --- Global Error Handler (must be last) ---
 app.use(errorMiddleware)
@@ -40,7 +46,7 @@ const options = {
   cert: fs.readFileSync("cert.pem"),
 }
 
-const PORT = process.env["PORT"] ?? 443
+const PORT = process.env["PORT"] ?? 3001
 
 https.createServer(options, app).listen(PORT, () => {
   console.log(`TaskTS Server running on https://localhost:${PORT}`)

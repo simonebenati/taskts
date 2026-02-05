@@ -35,7 +35,7 @@ export async function rtUpdates(
     // Event handler for tenant-scoped events
     const eventHandler = (event: TenantEvent<unknown>): void => {
         const eventData = JSON.stringify({
-            type: `${event.entity}:${event.type}`,
+            type: `${event.entity}_${event.type}`,
             data: event.data,
             timestamp: event.timestamp
         })

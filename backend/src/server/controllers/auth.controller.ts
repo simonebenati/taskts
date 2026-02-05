@@ -9,7 +9,8 @@ import {
     getRefreshTokenExpiry,
     getAccessTokenExpirySeconds
 } from "../utils/crypto.utils.js"
-import { notFoundError, unauthorizedError, conflictError } from "../middleware/error.middleware.js"
+import { notFoundError, unauthorizedError, conflictError, validationError } from "../middleware/error.middleware.js"
+import { acceptInvite } from "./invite.controller.js"
 
 /**
  * Registers a new user in the system.
@@ -22,20 +23,75 @@ export async function register(
     req: Request<object, AuthResponse, RegisterBody>,
     res: Response<AuthResponse>
 ): Promise<void> {
-    const { email, name, surname, password, tenantId } = req.body
+    const { email, name, surname, password, tenantId, inviteId } = req.body
+    let targetTenantId: string
+    let targetRoleId: string
 
-    // Verify tenant exists
-    const tenant = await prisma.tenant.findUnique({
-        where: { id: tenantId },
-        select: { id: true, isActive: true }
-    })
+    if (inviteId) {
+        // Find the invite
+        const invite = await prisma.invite.findUnique({
+            where: { id: inviteId },
+            select: { id: true, tenantId: true, role: true, expiresAt: true, status: true }
+        })
 
-    if (!tenant) {
-        throw notFoundError("Tenant")
-    }
+        if (!invite) {
+            throw notFoundError("Invite")
+        }
 
-    if (!tenant.isActive) {
-        throw conflictError("Cannot register to an inactive tenant")
+        if (invite.status !== "pending") {
+            throw conflictError("Invite has already been used or revoked")
+        }
+
+        if (invite.expiresAt < new Date()) {
+            throw conflictError("Invite has expired")
+        }
+
+        targetTenantId = invite.tenantId
+
+        // Find or create the role specified in the invite
+        let role = await prisma.role.findFirst({
+            where: { tenantId: targetTenantId, name: invite.role }
+        })
+
+        if (!role) {
+            role = await prisma.role.create({
+                data: { tenantId: targetTenantId, name: invite.role }
+            })
+        }
+        targetRoleId = role.id
+    } else {
+        if (!tenantId) {
+            throw validationError("Tenant ID is required for non-invite registration")
+        }
+        targetTenantId = tenantId
+
+        // Verify tenant exists
+        const tenant = await prisma.tenant.findUnique({
+            where: { id: targetTenantId },
+            select: { id: true, isActive: true }
+        })
+
+        if (!tenant) {
+            throw notFoundError("Tenant")
+        }
+
+        if (!tenant.isActive) {
+            throw conflictError("Cannot register to an inactive tenant")
+        }
+
+        // Get default "member" role for this tenant
+        let memberRole = await prisma.role.findFirst({
+            where: { tenantId: targetTenantId, name: "member" },
+            select: { id: true }
+        })
+
+        if (!memberRole) {
+            memberRole = await prisma.role.create({
+                data: { tenantId: targetTenantId, name: "member" },
+                select: { id: true }
+            })
+        }
+        targetRoleId = memberRole.id
     }
 
     // Check if email already exists
@@ -48,19 +104,6 @@ export async function register(
         throw conflictError("A user with this email already exists")
     }
 
-    // Get default "member" role for this tenant (create if doesn't exist)
-    let memberRole = await prisma.role.findFirst({
-        where: { tenantId, name: "member" },
-        select: { id: true }
-    })
-
-    if (!memberRole) {
-        memberRole = await prisma.role.create({
-            data: { tenantId, name: "member" },
-            select: { id: true }
-        })
-    }
-
     // Hash password
     const hashedPassword = await hashPassword(password)
 
@@ -71,24 +114,46 @@ export async function register(
             name,
             surname,
             password: hashedPassword,
-            tenantId,
-            roleId: memberRole.id
+            tenantId: targetTenantId,
+            roleId: targetRoleId,
+            isActive: !!inviteId // Invite users are auto-active, others need approval if not first user
         },
-        select: {
-            id: true,
-            email: true,
-            name: true,
-            surname: true,
-            tenantId: true,
+        include: {
             role: { select: { name: true } }
         }
     })
+
+    // If invite used, accept it
+    if (inviteId) {
+        await acceptInvite(inviteId, user.id)
+    }
+
+    // Determine if auto-approved
+    const isAutoApproved = user.isActive
+
+    if (!isAutoApproved) {
+        res.status(201).json({
+            accessToken: '',
+            refreshToken: '',
+            expiresIn: 0,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                surname: user.surname,
+                tenantId: user.tenantId,
+                roleName: user.role.name
+            },
+            message: 'Registration successful. Your account is pending admin approval.'
+        } as any)
+        return
+    }
 
     // Generate tokens
     const accessToken = generateAccessToken({
         userId: user.id,
         tenantId: user.tenantId,
-        roleId: memberRole.id,
+        roleId: targetRoleId,
         roleName: user.role.name
     })
 
@@ -143,7 +208,7 @@ export async function login(
             tenantId: true,
             roleId: true,
             role: { select: { name: true } },
-            tenant: { select: { isActive: true } }
+            tenant: { select: { isActive: true, name: true } }
         }
     })
 
@@ -195,7 +260,8 @@ export async function login(
             name: user.name,
             surname: user.surname,
             tenantId: user.tenantId,
-            roleName: user.role.name
+            roleName: user.role.name,
+            tenantName: user.tenant.name
         }
     })
 }

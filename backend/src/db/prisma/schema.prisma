@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "./src/db/prisma"
 }
 
 datasource db {
@@ -25,10 +24,11 @@ model Tenant {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  users  User[]
-  boards Board[]
-  roles  Role[]
-  groups Group[]
+  users   User[]
+  boards  Board[]
+  roles   Role[]
+  groups  Group[]
+  invites Invite[]
 
   @@index([isActive])
 }
@@ -39,14 +39,17 @@ model Tenant {
 
 /// User belongs to exactly one tenant
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique @db.VarChar(255)
-  name      String   @db.VarChar(50)
-  surname   String   @db.VarChar(50)
-  password  String   @db.VarChar(255) // bcrypt hash
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(uuid()) @db.Uuid
+  email            String    @unique @db.VarChar(255)
+  name             String    @db.VarChar(50)
+  surname          String    @db.VarChar(50)
+  password         String    @db.VarChar(255) // bcrypt hash
+  isActive         Boolean   @default(true)
+  isGuest          Boolean   @default(false)
+  guestExpiresAt   DateTime?
+  originalTenantId String?   @db.Uuid
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Foreign keys
   tenantId String  @db.Uuid
@@ -61,6 +64,7 @@ model User {
   ownedTasks    Task[]        @relation("TaskOwner")
   assignedTasks Task[]        @relation("TaskAssignee")
   refreshTokens RefreshToken[]
+  sentInvites   Invite[]
 
   @@index([tenantId])
   @@index([email])
@@ -91,6 +95,30 @@ model Role {
 
   @@unique([tenantId, name]) // Role names unique per tenant
   @@index([tenantId])
+}
+
+/// Invitations for users to join a tenant
+model Invite {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @db.VarChar(255)
+  role      String   @db.VarChar(50) @default("member")
+  type      String   @db.VarChar(20) @default("member") // "member" or "guest"
+  status    String   @db.VarChar(20) @default("pending") // "pending", "accepted", "revoked"
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Foreign keys
+  tenantId  String @db.Uuid
+  invitedBy String @db.Uuid
+
+  // Relations
+  tenant  Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inviter User   @relation(fields: [invitedBy], references: [id])
+
+  @@unique([email, tenantId, status])
+  @@index([tenantId])
+  @@index([email])
+  @@index([status])
 }
 
 // =============================================================================

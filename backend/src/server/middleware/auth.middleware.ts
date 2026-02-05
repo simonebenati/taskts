@@ -15,29 +15,26 @@ export function authMiddleware(
     res: Response,
     next: NextFunction
 ): void {
-    const authHeader = req.headers.authorization
+    let token: string | undefined
 
     // Check for Authorization header
-    if (!authHeader) {
+    const authHeader = req.headers.authorization
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.slice(7)
+    } else if (req.query && typeof req.query.token === "string") {
+        // Fallback to query parameter (needed for SSE)
+        token = req.query.token
+    }
+
+    if (!token) {
         res.status(401).json({
             success: false,
             code: "UNAUTHORIZED",
-            message: "Authorization header is required"
+            message: "Authorization required"
         })
         return
     }
-
-    // Validate Bearer token format
-    if (!authHeader.startsWith("Bearer ")) {
-        res.status(401).json({
-            success: false,
-            code: "INVALID_TOKEN_FORMAT",
-            message: "Authorization header must be in format: Bearer <token>"
-        })
-        return
-    }
-
-    const token = authHeader.slice(7) // Remove "Bearer " prefix
 
     // Verify and decode token
     const payload: TokenPayload | null = verifyAccessToken(token)

@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { SearchModal } from '../components/SearchModal';
 
 export const ProtectedRoute = () => {
     const { user, loading } = useAuth();
@@ -12,7 +13,12 @@ export const ProtectedRoute = () => {
         return <Navigate to="/login" replace />;
     }
 
-    return <Outlet />;
+    return (
+        <>
+            <Outlet />
+            <SearchModal />
+        </>
+    );
 };
 
 export const PublicRoute = () => {

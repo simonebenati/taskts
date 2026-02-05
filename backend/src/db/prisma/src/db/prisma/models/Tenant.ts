@@ -202,6 +202,7 @@ export type TenantWhereInput = {
   boards?: Prisma.BoardListRelationFilter
   roles?: Prisma.RoleListRelationFilter
   groups?: Prisma.GroupListRelationFilter
+  invites?: Prisma.InviteListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -216,6 +217,7 @@ export type TenantOrderByWithRelationInput = {
   boards?: Prisma.BoardOrderByRelationAggregateInput
   roles?: Prisma.RoleOrderByRelationAggregateInput
   groups?: Prisma.GroupOrderByRelationAggregateInput
+  invites?: Prisma.InviteOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -233,6 +235,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   boards?: Prisma.BoardListRelationFilter
   roles?: Prisma.RoleListRelationFilter
   groups?: Prisma.GroupListRelationFilter
+  invites?: Prisma.InviteListRelationFilter
 }, "id">
 
 export type TenantOrderByWithAggregationInput = {
@@ -273,6 +276,7 @@ export type TenantCreateInput = {
   boards?: Prisma.BoardCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -287,6 +291,7 @@ export type TenantUncheckedCreateInput = {
   boards?: Prisma.BoardUncheckedCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupUncheckedCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -301,6 +306,7 @@ export type TenantUpdateInput = {
   boards?: Prisma.BoardUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -315,6 +321,7 @@ export type TenantUncheckedUpdateInput = {
   boards?: Prisma.BoardUncheckedUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUncheckedUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -440,6 +447,20 @@ export type TenantUpdateOneRequiredWithoutRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutRolesInput, Prisma.TenantUpdateWithoutRolesInput>, Prisma.TenantUncheckedUpdateWithoutRolesInput>
 }
 
+export type TenantCreateNestedOneWithoutInvitesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutInvitesInput, Prisma.TenantUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutInvitesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutInvitesInput, Prisma.TenantUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutInvitesInput
+  upsert?: Prisma.TenantUpsertWithoutInvitesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutInvitesInput, Prisma.TenantUpdateWithoutInvitesInput>, Prisma.TenantUncheckedUpdateWithoutInvitesInput>
+}
+
 export type TenantCreateNestedOneWithoutBoardsInput = {
   create?: Prisma.XOR<Prisma.TenantCreateWithoutBoardsInput, Prisma.TenantUncheckedCreateWithoutBoardsInput>
   connectOrCreate?: Prisma.TenantCreateOrConnectWithoutBoardsInput
@@ -465,6 +486,7 @@ export type TenantCreateWithoutUsersInput = {
   boards?: Prisma.BoardCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -478,6 +500,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   boards?: Prisma.BoardUncheckedCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupUncheckedCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -507,6 +530,7 @@ export type TenantUpdateWithoutUsersInput = {
   boards?: Prisma.BoardUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -520,6 +544,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   boards?: Prisma.BoardUncheckedUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUncheckedUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutGroupsInput = {
@@ -533,6 +558,7 @@ export type TenantCreateWithoutGroupsInput = {
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   boards?: Prisma.BoardCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutGroupsInput = {
@@ -546,6 +572,7 @@ export type TenantUncheckedCreateWithoutGroupsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   boards?: Prisma.BoardUncheckedCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutGroupsInput = {
@@ -575,6 +602,7 @@ export type TenantUpdateWithoutGroupsInput = {
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   boards?: Prisma.BoardUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutGroupsInput = {
@@ -588,6 +616,7 @@ export type TenantUncheckedUpdateWithoutGroupsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   boards?: Prisma.BoardUncheckedUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutRolesInput = {
@@ -601,6 +630,7 @@ export type TenantCreateWithoutRolesInput = {
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   boards?: Prisma.BoardCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutRolesInput = {
@@ -614,6 +644,7 @@ export type TenantUncheckedCreateWithoutRolesInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   boards?: Prisma.BoardUncheckedCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupUncheckedCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutRolesInput = {
@@ -643,6 +674,7 @@ export type TenantUpdateWithoutRolesInput = {
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   boards?: Prisma.BoardUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutRolesInput = {
@@ -655,6 +687,79 @@ export type TenantUncheckedUpdateWithoutRolesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   boards?: Prisma.BoardUncheckedUpdateManyWithoutTenantNestedInput
+  groups?: Prisma.GroupUncheckedUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutInvitesInput = {
+  id?: string
+  name: string
+  subscription?: string
+  paymentMethod?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  boards?: Prisma.BoardCreateNestedManyWithoutTenantInput
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
+  groups?: Prisma.GroupCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutInvitesInput = {
+  id?: string
+  name: string
+  subscription?: string
+  paymentMethod?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  boards?: Prisma.BoardUncheckedCreateNestedManyWithoutTenantInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
+  groups?: Prisma.GroupUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutInvitesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutInvitesInput, Prisma.TenantUncheckedCreateWithoutInvitesInput>
+}
+
+export type TenantUpsertWithoutInvitesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutInvitesInput, Prisma.TenantUncheckedUpdateWithoutInvitesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutInvitesInput, Prisma.TenantUncheckedCreateWithoutInvitesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutInvitesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutInvitesInput, Prisma.TenantUncheckedUpdateWithoutInvitesInput>
+}
+
+export type TenantUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  subscription?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  boards?: Prisma.BoardUpdateManyWithoutTenantNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
+  groups?: Prisma.GroupUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  subscription?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  boards?: Prisma.BoardUncheckedUpdateManyWithoutTenantNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUncheckedUpdateManyWithoutTenantNestedInput
 }
 
@@ -669,6 +774,7 @@ export type TenantCreateWithoutBoardsInput = {
   users?: Prisma.UserCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutBoardsInput = {
@@ -682,6 +788,7 @@ export type TenantUncheckedCreateWithoutBoardsInput = {
   users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   groups?: Prisma.GroupUncheckedCreateNestedManyWithoutTenantInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutBoardsInput = {
@@ -711,6 +818,7 @@ export type TenantUpdateWithoutBoardsInput = {
   users?: Prisma.UserUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutBoardsInput = {
@@ -724,6 +832,7 @@ export type TenantUncheckedUpdateWithoutBoardsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   groups?: Prisma.GroupUncheckedUpdateManyWithoutTenantNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -736,6 +845,7 @@ export type TenantCountOutputType = {
   boards: number
   roles: number
   groups: number
+  invites: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -743,6 +853,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   boards?: boolean | TenantCountOutputTypeCountBoardsArgs
   roles?: boolean | TenantCountOutputTypeCountRolesArgs
   groups?: boolean | TenantCountOutputTypeCountGroupsArgs
+  invites?: boolean | TenantCountOutputTypeCountInvitesArgs
 }
 
 /**
@@ -783,6 +894,13 @@ export type TenantCountOutputTypeCountGroupsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.GroupWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InviteWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -796,6 +914,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   boards?: boolean | Prisma.Tenant$boardsArgs<ExtArgs>
   roles?: boolean | Prisma.Tenant$rolesArgs<ExtArgs>
   groups?: boolean | Prisma.Tenant$groupsArgs<ExtArgs>
+  invites?: boolean | Prisma.Tenant$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -835,6 +954,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   boards?: boolean | Prisma.Tenant$boardsArgs<ExtArgs>
   roles?: boolean | Prisma.Tenant$rolesArgs<ExtArgs>
   groups?: boolean | Prisma.Tenant$groupsArgs<ExtArgs>
+  invites?: boolean | Prisma.Tenant$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -847,6 +967,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     boards: Prisma.$BoardPayload<ExtArgs>[]
     roles: Prisma.$RolePayload<ExtArgs>[]
     groups: Prisma.$GroupPayload<ExtArgs>[]
+    invites: Prisma.$InvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1254,6 +1375,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   boards<T extends Prisma.Tenant$boardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$boardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BoardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roles<T extends Prisma.Tenant$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   groups<T extends Prisma.Tenant$groupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$groupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invites<T extends Prisma.Tenant$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1771,6 +1893,30 @@ export type Tenant$groupsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.GroupScalarFieldEnum | Prisma.GroupScalarFieldEnum[]
+}
+
+/**
+ * Tenant.invites
+ */
+export type Tenant$invitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invite
+   */
+  select?: Prisma.InviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invite
+   */
+  omit?: Prisma.InviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InviteInclude<ExtArgs> | null
+  where?: Prisma.InviteWhereInput
+  orderBy?: Prisma.InviteOrderByWithRelationInput | Prisma.InviteOrderByWithRelationInput[]
+  cursor?: Prisma.InviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InviteScalarFieldEnum | Prisma.InviteScalarFieldEnum[]
 }
 
 /**

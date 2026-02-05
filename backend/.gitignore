@@ -1,2 +1,4 @@
 node_modules/
 /prisma/src/db/prisma
+dist/
+coverage/

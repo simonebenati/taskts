@@ -28,7 +28,8 @@ export interface RegisterBody {
     name: string
     surname: string
     password: string
-    tenantId: string
+    tenantId?: string
+    inviteId?: string
 }
 
 /**
@@ -52,6 +53,7 @@ export interface AuthResponse {
         surname: string
         tenantId: string
         roleName: string
+        tenantName?: string
     }
 }
 

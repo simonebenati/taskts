@@ -130,6 +130,14 @@ describe("Board Controller", () => {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 _count: { tasks: 2 },
+                owner: {
+                    id: testUserPayload.userId,
+                    email: "test@example.com",
+                    name: "John",
+                    surname: "Doe",
+                    tenantId: testUserPayload.tenantId,
+                    role: { name: "member" }
+                }
             }
 
             mockPrisma.board.findFirst.mockResolvedValue(mockBoard)

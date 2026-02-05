@@ -31,6 +31,9 @@ export type UserMinAggregateOutputType = {
   surname: string | null
   password: string | null
   isActive: boolean | null
+  isGuest: boolean | null
+  guestExpiresAt: Date | null
+  originalTenantId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   tenantId: string | null
@@ -45,6 +48,9 @@ export type UserMaxAggregateOutputType = {
   surname: string | null
   password: string | null
   isActive: boolean | null
+  isGuest: boolean | null
+  guestExpiresAt: Date | null
+  originalTenantId: string | null
   createdAt: Date | null
   updatedAt: Date | null
   tenantId: string | null
@@ -59,6 +65,9 @@ export type UserCountAggregateOutputType = {
   surname: number
   password: number
   isActive: number
+  isGuest: number
+  guestExpiresAt: number
+  originalTenantId: number
   createdAt: number
   updatedAt: number
   tenantId: number
@@ -75,6 +84,9 @@ export type UserMinAggregateInputType = {
   surname?: true
   password?: true
   isActive?: true
+  isGuest?: true
+  guestExpiresAt?: true
+  originalTenantId?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -89,6 +101,9 @@ export type UserMaxAggregateInputType = {
   surname?: true
   password?: true
   isActive?: true
+  isGuest?: true
+  guestExpiresAt?: true
+  originalTenantId?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -103,6 +118,9 @@ export type UserCountAggregateInputType = {
   surname?: true
   password?: true
   isActive?: true
+  isGuest?: true
+  guestExpiresAt?: true
+  originalTenantId?: true
   createdAt?: true
   updatedAt?: true
   tenantId?: true
@@ -190,6 +208,9 @@ export type UserGroupByOutputType = {
   surname: string
   password: string
   isActive: boolean
+  isGuest: boolean
+  guestExpiresAt: Date | null
+  originalTenantId: string | null
   createdAt: Date
   updatedAt: Date
   tenantId: string
@@ -225,6 +246,9 @@ export type UserWhereInput = {
   surname?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  isGuest?: Prisma.BoolFilter<"User"> | boolean
+  guestExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  originalTenantId?: Prisma.UuidNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   tenantId?: Prisma.UuidFilter<"User"> | string
@@ -237,6 +261,7 @@ export type UserWhereInput = {
   ownedTasks?: Prisma.TaskListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  sentInvites?: Prisma.InviteListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -246,6 +271,9 @@ export type UserOrderByWithRelationInput = {
   surname?: Prisma.SortOrder
   password?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isGuest?: Prisma.SortOrder
+  guestExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  originalTenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -258,6 +286,7 @@ export type UserOrderByWithRelationInput = {
   ownedTasks?: Prisma.TaskOrderByRelationAggregateInput
   assignedTasks?: Prisma.TaskOrderByRelationAggregateInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
+  sentInvites?: Prisma.InviteOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -270,6 +299,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   surname?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  isGuest?: Prisma.BoolFilter<"User"> | boolean
+  guestExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  originalTenantId?: Prisma.UuidNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   tenantId?: Prisma.UuidFilter<"User"> | string
@@ -282,6 +314,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   ownedTasks?: Prisma.TaskListRelationFilter
   assignedTasks?: Prisma.TaskListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  sentInvites?: Prisma.InviteListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -291,6 +324,9 @@ export type UserOrderByWithAggregationInput = {
   surname?: Prisma.SortOrder
   password?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isGuest?: Prisma.SortOrder
+  guestExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  originalTenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -311,6 +347,9 @@ export type UserScalarWhereWithAggregatesInput = {
   surname?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  isGuest?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  guestExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  originalTenantId?: Prisma.UuidNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   tenantId?: Prisma.UuidWithAggregatesFilter<"User"> | string
@@ -325,6 +364,9 @@ export type UserCreateInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -334,6 +376,7 @@ export type UserCreateInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -343,6 +386,9 @@ export type UserUncheckedCreateInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -352,6 +398,7 @@ export type UserUncheckedCreateInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserUpdateInput = {
@@ -361,6 +408,9 @@ export type UserUpdateInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -370,6 +420,7 @@ export type UserUpdateInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -379,6 +430,9 @@ export type UserUncheckedUpdateInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -388,6 +442,7 @@ export type UserUncheckedUpdateInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -397,6 +452,9 @@ export type UserCreateManyInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -411,6 +469,9 @@ export type UserUpdateManyMutationInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -422,6 +483,9 @@ export type UserUncheckedUpdateManyInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -446,6 +510,9 @@ export type UserCountOrderByAggregateInput = {
   surname?: Prisma.SortOrder
   password?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isGuest?: Prisma.SortOrder
+  guestExpiresAt?: Prisma.SortOrder
+  originalTenantId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -460,6 +527,9 @@ export type UserMaxOrderByAggregateInput = {
   surname?: Prisma.SortOrder
   password?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isGuest?: Prisma.SortOrder
+  guestExpiresAt?: Prisma.SortOrder
+  originalTenantId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -474,6 +544,9 @@ export type UserMinOrderByAggregateInput = {
   surname?: Prisma.SortOrder
   password?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isGuest?: Prisma.SortOrder
+  guestExpiresAt?: Prisma.SortOrder
+  originalTenantId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
@@ -531,6 +604,10 @@ export type UserUncheckedUpdateManyWithoutTenantNestedInput = {
   update?: Prisma.UserUpdateWithWhereUniqueWithoutTenantInput | Prisma.UserUpdateWithWhereUniqueWithoutTenantInput[]
   updateMany?: Prisma.UserUpdateManyWithWhereWithoutTenantInput | Prisma.UserUpdateManyWithWhereWithoutTenantInput[]
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserCreateNestedManyWithoutGroupInput = {
@@ -617,6 +694,20 @@ export type UserUncheckedUpdateManyWithoutRoleNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
+export type UserCreateNestedOneWithoutSentInvitesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentInvitesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSentInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentInvitesInput
+  upsert?: Prisma.UserUpsertWithoutSentInvitesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentInvitesInput, Prisma.UserUpdateWithoutSentInvitesInput>, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+}
+
 export type UserCreateNestedOneWithoutOwnedBoardsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedBoardsInput, Prisma.UserUncheckedCreateWithoutOwnedBoardsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedBoardsInput
@@ -682,6 +773,9 @@ export type UserCreateWithoutTenantInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   role: Prisma.RoleCreateNestedOneWithoutUsersInput
@@ -690,6 +784,7 @@ export type UserCreateWithoutTenantInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutTenantInput = {
@@ -699,6 +794,9 @@ export type UserUncheckedCreateWithoutTenantInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roleId: string
@@ -707,6 +805,7 @@ export type UserUncheckedCreateWithoutTenantInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutTenantInput = {
@@ -745,6 +844,9 @@ export type UserScalarWhereInput = {
   surname?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  isGuest?: Prisma.BoolFilter<"User"> | boolean
+  guestExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  originalTenantId?: Prisma.UuidNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   tenantId?: Prisma.UuidFilter<"User"> | string
@@ -759,6 +861,9 @@ export type UserCreateWithoutGroupInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -767,6 +872,7 @@ export type UserCreateWithoutGroupInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutGroupInput = {
@@ -776,6 +882,9 @@ export type UserUncheckedCreateWithoutGroupInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -784,6 +893,7 @@ export type UserUncheckedCreateWithoutGroupInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutGroupInput = {
@@ -819,6 +929,9 @@ export type UserCreateWithoutRoleInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -827,6 +940,7 @@ export type UserCreateWithoutRoleInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutRoleInput = {
@@ -836,6 +950,9 @@ export type UserUncheckedCreateWithoutRoleInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -844,6 +961,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutRoleInput = {
@@ -872,6 +990,106 @@ export type UserUpdateManyWithWhereWithoutRoleInput = {
   data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutRoleInput>
 }
 
+export type UserCreateWithoutSentInvitesInput = {
+  id?: string
+  email: string
+  name: string
+  surname: string
+  password: string
+  isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  role: Prisma.RoleCreateNestedOneWithoutUsersInput
+  group?: Prisma.GroupCreateNestedOneWithoutUsersInput
+  ownedBoards?: Prisma.BoardCreateNestedManyWithoutOwnerInput
+  ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSentInvitesInput = {
+  id?: string
+  email: string
+  name: string
+  surname: string
+  password: string
+  isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenantId: string
+  roleId: string
+  groupId?: string | null
+  ownedBoards?: Prisma.BoardUncheckedCreateNestedManyWithoutOwnerInput
+  ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSentInvitesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+}
+
+export type UserUpsertWithoutSentInvitesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSentInvitesInput, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentInvitesInput, Prisma.UserUncheckedCreateWithoutSentInvitesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSentInvitesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSentInvitesInput, Prisma.UserUncheckedUpdateWithoutSentInvitesInput>
+}
+
+export type UserUpdateWithoutSentInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  surname?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+  group?: Prisma.GroupUpdateOneWithoutUsersNestedInput
+  ownedBoards?: Prisma.BoardUpdateManyWithoutOwnerNestedInput
+  ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSentInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  surname?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  groupId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownedBoards?: Prisma.BoardUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutOwnedBoardsInput = {
   id?: string
   email: string
@@ -879,6 +1097,9 @@ export type UserCreateWithoutOwnedBoardsInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -887,6 +1108,7 @@ export type UserCreateWithoutOwnedBoardsInput = {
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutOwnedBoardsInput = {
@@ -896,6 +1118,9 @@ export type UserUncheckedCreateWithoutOwnedBoardsInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -904,6 +1129,7 @@ export type UserUncheckedCreateWithoutOwnedBoardsInput = {
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutOwnedBoardsInput = {
@@ -929,6 +1155,9 @@ export type UserUpdateWithoutOwnedBoardsInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -937,6 +1166,7 @@ export type UserUpdateWithoutOwnedBoardsInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedBoardsInput = {
@@ -946,6 +1176,9 @@ export type UserUncheckedUpdateWithoutOwnedBoardsInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -954,6 +1187,7 @@ export type UserUncheckedUpdateWithoutOwnedBoardsInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserCreateWithoutOwnedTasksInput = {
@@ -963,6 +1197,9 @@ export type UserCreateWithoutOwnedTasksInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -971,6 +1208,7 @@ export type UserCreateWithoutOwnedTasksInput = {
   ownedBoards?: Prisma.BoardCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutOwnedTasksInput = {
@@ -980,6 +1218,9 @@ export type UserUncheckedCreateWithoutOwnedTasksInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -988,6 +1229,7 @@ export type UserUncheckedCreateWithoutOwnedTasksInput = {
   ownedBoards?: Prisma.BoardUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutOwnedTasksInput = {
@@ -1002,6 +1244,9 @@ export type UserCreateWithoutAssignedTasksInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -1010,6 +1255,7 @@ export type UserCreateWithoutAssignedTasksInput = {
   ownedBoards?: Prisma.BoardCreateNestedManyWithoutOwnerInput
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutAssignedTasksInput = {
@@ -1019,6 +1265,9 @@ export type UserUncheckedCreateWithoutAssignedTasksInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -1027,6 +1276,7 @@ export type UserUncheckedCreateWithoutAssignedTasksInput = {
   ownedBoards?: Prisma.BoardUncheckedCreateNestedManyWithoutOwnerInput
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutAssignedTasksInput = {
@@ -1052,6 +1302,9 @@ export type UserUpdateWithoutOwnedTasksInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -1060,6 +1313,7 @@ export type UserUpdateWithoutOwnedTasksInput = {
   ownedBoards?: Prisma.BoardUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedTasksInput = {
@@ -1069,6 +1323,9 @@ export type UserUncheckedUpdateWithoutOwnedTasksInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1077,6 +1334,7 @@ export type UserUncheckedUpdateWithoutOwnedTasksInput = {
   ownedBoards?: Prisma.BoardUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUpsertWithoutAssignedTasksInput = {
@@ -1097,6 +1355,9 @@ export type UserUpdateWithoutAssignedTasksInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -1105,6 +1366,7 @@ export type UserUpdateWithoutAssignedTasksInput = {
   ownedBoards?: Prisma.BoardUpdateManyWithoutOwnerNestedInput
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedTasksInput = {
@@ -1114,6 +1376,9 @@ export type UserUncheckedUpdateWithoutAssignedTasksInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1122,6 +1387,7 @@ export type UserUncheckedUpdateWithoutAssignedTasksInput = {
   ownedBoards?: Prisma.BoardUncheckedUpdateManyWithoutOwnerNestedInput
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserCreateWithoutRefreshTokensInput = {
@@ -1131,6 +1397,9 @@ export type UserCreateWithoutRefreshTokensInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
@@ -1139,6 +1408,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   ownedBoards?: Prisma.BoardCreateNestedManyWithoutOwnerInput
   ownedTasks?: Prisma.TaskCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneeInput
+  sentInvites?: Prisma.InviteCreateNestedManyWithoutInviterInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -1148,6 +1418,9 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -1156,6 +1429,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   ownedBoards?: Prisma.BoardUncheckedCreateNestedManyWithoutOwnerInput
   ownedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutOwnerInput
   assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneeInput
+  sentInvites?: Prisma.InviteUncheckedCreateNestedManyWithoutInviterInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -1181,6 +1455,9 @@ export type UserUpdateWithoutRefreshTokensInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -1189,6 +1466,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   ownedBoards?: Prisma.BoardUpdateManyWithoutOwnerNestedInput
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -1198,6 +1476,9 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1206,6 +1487,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   ownedBoards?: Prisma.BoardUncheckedUpdateManyWithoutOwnerNestedInput
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserCreateManyTenantInput = {
@@ -1215,6 +1497,9 @@ export type UserCreateManyTenantInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roleId: string
@@ -1228,6 +1513,9 @@ export type UserUpdateWithoutTenantInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
@@ -1236,6 +1524,7 @@ export type UserUpdateWithoutTenantInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTenantInput = {
@@ -1245,6 +1534,9 @@ export type UserUncheckedUpdateWithoutTenantInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roleId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1253,6 +1545,7 @@ export type UserUncheckedUpdateWithoutTenantInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutTenantInput = {
@@ -1262,6 +1555,9 @@ export type UserUncheckedUpdateManyWithoutTenantInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roleId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1275,6 +1571,9 @@ export type UserCreateManyGroupInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -1288,6 +1587,9 @@ export type UserUpdateWithoutGroupInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -1296,6 +1598,7 @@ export type UserUpdateWithoutGroupInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutGroupInput = {
@@ -1305,6 +1608,9 @@ export type UserUncheckedUpdateWithoutGroupInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1313,6 +1619,7 @@ export type UserUncheckedUpdateWithoutGroupInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutGroupInput = {
@@ -1322,6 +1629,9 @@ export type UserUncheckedUpdateManyWithoutGroupInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1335,6 +1645,9 @@ export type UserCreateManyRoleInput = {
   surname: string
   password: string
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: Date | string | null
+  originalTenantId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenantId: string
@@ -1348,6 +1661,9 @@ export type UserUpdateWithoutRoleInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
@@ -1356,6 +1672,7 @@ export type UserUpdateWithoutRoleInput = {
   ownedTasks?: Prisma.TaskUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoleInput = {
@@ -1365,6 +1682,9 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1373,6 +1693,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   ownedTasks?: Prisma.TaskUncheckedUpdateManyWithoutOwnerNestedInput
   assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneeNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  sentInvites?: Prisma.InviteUncheckedUpdateManyWithoutInviterNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -1382,6 +1703,9 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
   surname?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isGuest?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  guestExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  originalTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1398,6 +1722,7 @@ export type UserCountOutputType = {
   ownedTasks: number
   assignedTasks: number
   refreshTokens: number
+  sentInvites: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1405,6 +1730,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   ownedTasks?: boolean | UserCountOutputTypeCountOwnedTasksArgs
   assignedTasks?: boolean | UserCountOutputTypeCountAssignedTasksArgs
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
+  sentInvites?: boolean | UserCountOutputTypeCountSentInvitesArgs
 }
 
 /**
@@ -1445,6 +1771,13 @@ export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Ty
   where?: Prisma.RefreshTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InviteWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1453,6 +1786,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   surname?: boolean
   password?: boolean
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: boolean
+  originalTenantId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -1465,6 +1801,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ownedTasks?: boolean | Prisma.User$ownedTasksArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.User$assignedTasksArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1475,6 +1812,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   surname?: boolean
   password?: boolean
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: boolean
+  originalTenantId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -1492,6 +1832,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   surname?: boolean
   password?: boolean
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: boolean
+  originalTenantId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -1509,6 +1852,9 @@ export type UserSelectScalar = {
   surname?: boolean
   password?: boolean
   isActive?: boolean
+  isGuest?: boolean
+  guestExpiresAt?: boolean
+  originalTenantId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenantId?: boolean
@@ -1516,7 +1862,7 @@ export type UserSelectScalar = {
   groupId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "surname" | "password" | "isActive" | "createdAt" | "updatedAt" | "tenantId" | "roleId" | "groupId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "surname" | "password" | "isActive" | "isGuest" | "guestExpiresAt" | "originalTenantId" | "createdAt" | "updatedAt" | "tenantId" | "roleId" | "groupId", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
@@ -1525,6 +1871,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ownedTasks?: boolean | Prisma.User$ownedTasksArgs<ExtArgs>
   assignedTasks?: boolean | Prisma.User$assignedTasksArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  sentInvites?: boolean | Prisma.User$sentInvitesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1548,6 +1895,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ownedTasks: Prisma.$TaskPayload<ExtArgs>[]
     assignedTasks: Prisma.$TaskPayload<ExtArgs>[]
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
+    sentInvites: Prisma.$InvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1556,6 +1904,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     surname: string
     password: string
     isActive: boolean
+    isGuest: boolean
+    guestExpiresAt: Date | null
+    originalTenantId: string | null
     createdAt: Date
     updatedAt: Date
     tenantId: string
@@ -1962,6 +2313,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   ownedTasks<T extends Prisma.User$ownedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedTasks<T extends Prisma.User$assignedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentInvites<T extends Prisma.User$sentInvitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentInvitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1997,6 +2349,9 @@ export interface UserFieldRefs {
   readonly surname: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
+  readonly isGuest: Prisma.FieldRef<"User", 'Boolean'>
+  readonly guestExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly originalTenantId: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly tenantId: Prisma.FieldRef<"User", 'String'>
@@ -2510,6 +2865,30 @@ export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[]
+}
+
+/**
+ * User.sentInvites
+ */
+export type User$sentInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Invite
+   */
+  select?: Prisma.InviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Invite
+   */
+  omit?: Prisma.InviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InviteInclude<ExtArgs> | null
+  where?: Prisma.InviteWhereInput
+  orderBy?: Prisma.InviteOrderByWithRelationInput | Prisma.InviteOrderByWithRelationInput[]
+  cursor?: Prisma.InviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InviteScalarFieldEnum | Prisma.InviteScalarFieldEnum[]
 }
 
 /**

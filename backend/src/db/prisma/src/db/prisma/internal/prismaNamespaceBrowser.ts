@@ -55,6 +55,7 @@ export const ModelName = {
   User: 'User',
   Group: 'Group',
   Role: 'Role',
+  Invite: 'Invite',
   Board: 'Board',
   Task: 'Task',
   RefreshToken: 'RefreshToken'
@@ -96,6 +97,9 @@ export const UserScalarFieldEnum = {
   surname: 'surname',
   password: 'password',
   isActive: 'isActive',
+  isGuest: 'isGuest',
+  guestExpiresAt: 'guestExpiresAt',
+  originalTenantId: 'originalTenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   tenantId: 'tenantId',
@@ -123,6 +127,21 @@ export const RoleScalarFieldEnum = {
 } as const
 
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const InviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  role: 'role',
+  type: 'type',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  tenantId: 'tenantId',
+  invitedBy: 'invitedBy'
+} as const
+
+export type InviteScalarFieldEnum = (typeof InviteScalarFieldEnum)[keyof typeof InviteScalarFieldEnum]
 
 
 export const BoardScalarFieldEnum = {
